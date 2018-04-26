@@ -29,7 +29,7 @@ public class ChatClient extends Applet {
     private Button send = new Button("Send"), connect = new Button("Connect"),
             quit = new Button("Bye");
     private String serverName = "localhost";
-    private int serverPort = 3074;
+    private int serverPort = 10001;
     private String user;
     private SocketAddress localSocketAddress;
 

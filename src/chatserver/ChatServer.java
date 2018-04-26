@@ -77,10 +77,10 @@ public class ChatServer implements Runnable {
             Iterator<ChatServerThread> iterator = clients.values().iterator();
             while (iterator.hasNext()) {
                 ChatServerThread value = iterator.next();
-               if (pack.getPort_ID() != value.getID()) {
-                    System.out.println(pack.getPort_ID() +" - "+value.getID());
+                if (pack.getPort_ID() != value.getID()) {
+                    System.out.println(pack.getPort_ID() + " - " + value.getID());
                     value.send(pack);
-               }
+                }
             }
 
         }
@@ -126,13 +126,6 @@ public class ChatServer implements Runnable {
         }
     }
 
-    public static void main(String args[]) {
-        ChatServer server = null;
-
-        server = new ChatServer((3074));
-
-    }
-
     private void broadcastInfo(PackData pack) {
         Iterator<ChatServerThread> iterator = clients.values().iterator();
         while (iterator.hasNext()) {
@@ -146,4 +139,10 @@ public class ChatServer implements Runnable {
         }
     }
 
+    public static void main(String args[]) {
+        ChatServer server = null;
+
+        server = new ChatServer((10001));
+
+    }
 }
