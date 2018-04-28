@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +31,8 @@ import java.util.logging.Logger;
 public class ChatServer implements Runnable {
 
     // private ChatServerThread clients[] = new ChatServerThread[50];
-    private ConcurrentHashMap<Integer, ChatServerThread> clients = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, ChatServerThread> clients;
+    private LinkedBlockingQueue<PackData> messageStack;
 
     private ServerSocket server = null;
     private Thread thread = null;
@@ -44,13 +46,17 @@ public class ChatServer implements Runnable {
             server = new ServerSocket(port);
 
             System.out.println(getCurrentDate() + " Server started: " + server);
+            clients = new ConcurrentHashMap<>();
+            messageStack = new LinkedBlockingQueue<>();
             start();
         } catch (IOException ioe) {
             System.out.println(getCurrentDate() + " Can not bind to port " + port + ": " + ioe.getMessage());
         }
     }
 
+    @Override
     public void run() {
+        new Thread(new ServerManagerThread(this)).start();
         while (thread != null) {
             try {
                 System.out.println(getCurrentDate() + " Waiting for a client ...");
@@ -63,8 +69,12 @@ public class ChatServer implements Runnable {
         }
     }
 
+    /*
+        PackData is added  to messageStack when it is different to the type close
+        For the type text only, is broadcast directly otherwise is process in 
+        Server Manager.
+     */
     public synchronized void handle(PackData pack) throws Throwable {
-        //System.out.println(ID + " " + input);
 
         if (pack.getType().equals(KeyWordSystem.Close_Connection)) {
             PackData msg = new PackData(clients.get(pack.getPort_ID()).getUserName(), KeyWordSystem.Disconnected, KeyWordSystem._Bot + pack.getFrom() + " " + KeyWordSystem.Disconnected);
@@ -73,16 +83,16 @@ public class ChatServer implements Runnable {
             clients.get(pack.getPort_ID()).send(msg);
             remove(pack.getPort_ID());
         } else {
+            messageStack.add(pack);
             ChatServerThread from = clients.get(pack.getPort_ID());
             Iterator<ChatServerThread> iterator = clients.values().iterator();
             while (iterator.hasNext()) {
                 ChatServerThread value = iterator.next();
-                if (pack.getPort_ID() != value.getID()) {
+              //  if (pack.getPort_ID() != value.getID()) {
                     System.out.println(pack.getPort_ID() + " - " + value.getID());
                     value.send(pack);
-                }
+              //  }
             }
-
         }
     }
 
@@ -115,7 +125,8 @@ public class ChatServer implements Runnable {
     public void start() {
         if (thread == null) {
             thread = new Thread(this);
-            thread.start();
+             
+            thread.start();                 
         }
     }
 
@@ -137,6 +148,14 @@ public class ChatServer implements Runnable {
             }
 
         }
+    }
+
+    public ServerSocket getServer() {
+        return server;
+    }
+
+    public LinkedBlockingQueue<PackData> getMessageStack() {
+        return messageStack;
     }
 
     public static void main(String args[]) {
