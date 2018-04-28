@@ -8,6 +8,8 @@ package chatserver;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.PackData;
 import com.example.hp.groupchat.shared.ServerUtils;
+import com.sun.xml.internal.messaging.saaj.util.Base64;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -35,12 +38,12 @@ public class ServerManagerThread implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(ServerUtils.dateLog()+" Run ServerManager");
+        System.out.println(ServerUtils.dateLog() + " Run ServerManager");
         while (true) {
             try {
                 packData = chatServer.getMessageStack().take();
                 if (packData.getType().equals(KeyWordSystem.File_Transfer)) {
-                   new Thread(new saveFileRunnable(packData)).start();
+                    new Thread(new saveFileRunnable(packData)).start();
                 }
                 pds.add(packData);
             } catch (InterruptedException ex) {
@@ -60,8 +63,9 @@ public class ServerManagerThread implements Runnable {
         @Override
         public void run() {
             try {
-                Path p = Paths.get(pathDirectory + File.separator + "Img-" + pd.getFrom() + "-" + ServerUtils.simpleDate()+ ".png");
-                Files.write(p, pd.getContent());
+                byte[] b = pd.getContent();               
+                Path p = Paths.get(pathDirectory + File.separator + "Img-" + pd.getFrom() + "-" + ServerUtils.simpleDate() + ".png");
+                Files.write(p, b);
                 System.out.println(chatServer.getCurrentDate() + " file create.");
 
             } catch (IOException ex) {
