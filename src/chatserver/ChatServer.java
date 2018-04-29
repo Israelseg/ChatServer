@@ -88,10 +88,10 @@ public class ChatServer implements Runnable {
             Iterator<ChatServerThread> iterator = clients.values().iterator();
             while (iterator.hasNext()) {
                 ChatServerThread value = iterator.next();
-              //  if (pack.getPort_ID() != value.getID()) {
+                if (pack.getPort_ID() != value.getID()) {
                     System.out.println(pack.getPort_ID() + " - " + value.getID());
                     value.send(pack);
-              //  }
+                }
             }
         }
     }
