@@ -95,7 +95,7 @@ public class ChatClient extends Applet {
                 txt = "Bye... ";
             }
 
-            PackData pack = new PackData(user, (!txt.isEmpty()) ? KeyWordSystem.Close_Connection : KeyWordSystem.Only_Text, input.getText());
+            PackData pack = new PackData(user, (!txt.isEmpty()) ? KeyWordSystem.Close_Connection : KeyWordSystem.Text_Only, input.getText());
           //  streamOut = new ObjectOutputStream(socket.getOutputStream());
             streamOut.writeObject(pack);
             //streamOut.flush();

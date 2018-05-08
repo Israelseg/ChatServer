@@ -110,7 +110,7 @@ public class ChatServerThread extends Thread {
         streamOut = new ObjectOutputStream(socket.getOutputStream());
         PackData pack = (PackData) streamIn.readObject();
         userName = pack.getFrom();
-        PackData grettings = new PackData(KeyWordSystem._Bot, KeyWordSystem.Only_Text, KeyWordSystem._Bot + " Welcome " + userName + "!");
+        PackData grettings = new PackData(KeyWordSystem._Bot, KeyWordSystem.Text_Only, KeyWordSystem._Bot + " Welcome " + userName + "!");
         streamOut.writeObject(grettings);
     }
 
