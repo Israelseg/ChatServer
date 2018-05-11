@@ -18,5 +18,6 @@ public class KeyWordSystem {
     public static String _Bot = "Bot: ";
     public static String Disconnected = " has disconnected";
     public static String UserConnected = " has connected";
+    public static String Response = "Response#";
 
 }

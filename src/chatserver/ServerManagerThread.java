@@ -29,6 +29,7 @@ public class ServerManagerThread implements Runnable {
     private final ChatServer chatServer;
     private ArrayList<PackData> pds;
     private PackData packData;
+    private MessageAnalyzer messageAnalyzer;
     private final String pathDirectory = "/home/hp/NetBeansProjects/ChatServer/src/imgUsers";
 
     public ServerManagerThread(ChatServer chatServer) {
@@ -44,10 +45,26 @@ public class ServerManagerThread implements Runnable {
                 packData = chatServer.getMessageStack().take();
                 if (packData.getType().equals(KeyWordSystem.File_Transfer)) {
                     new Thread(new saveFileRunnable(packData)).start();
+                } else {
+                    messageAnalyzer = new MessageAnalyzer(packData.getText());
+                    //System.out.println(messageAnalyzer.getAction());
+                    /* 
+                    Switch: action to take
+                    default nothing
+                     */
+                    String actionString = messageAnalyzer.getAction();
+                    if (!actionString.equals(messageAnalyzer.Nothing)) {
+                        System.out.println(ServerUtils.dateLog() + " " + actionString);
+                        PackData responseServer = new PackData(KeyWordSystem._Bot, KeyWordSystem.Response, actionString);
+                        chatServer.broadcastInfo(responseServer);
+                    }
+
                 }
                 pds.add(packData);
             } catch (InterruptedException ex) {
                 System.out.println(chatServer.getCurrentDate() + " Error save data " + ex.getMessage());
+            } catch (Throwable ex) {
+                Logger.getLogger(ServerManagerThread.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -63,7 +80,7 @@ public class ServerManagerThread implements Runnable {
         @Override
         public void run() {
             try {
-                byte[] b = pd.getContent();               
+                byte[] b = pd.getContent();
                 Path p = Paths.get(pathDirectory + File.separator + "Img-" + pd.getFrom() + "-" + ServerUtils.simpleDate() + ".png");
                 Files.write(p, b);
                 System.out.println(chatServer.getCurrentDate() + " file create.");
