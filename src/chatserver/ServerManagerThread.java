@@ -47,7 +47,6 @@ public class ServerManagerThread implements Runnable {
                     new Thread(new saveFileRunnable(packData)).start();
                 } else {
                     messageAnalyzer = new MessageAnalyzer(packData.getText());
-                    //System.out.println(messageAnalyzer.getAction());
                     /* 
                     Switch: action to take
                     default nothing
