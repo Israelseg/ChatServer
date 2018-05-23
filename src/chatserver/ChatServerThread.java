@@ -6,7 +6,7 @@
 package chatserver;
 
 import com.example.hp.groupchat.shared.KeyWordSystem;
-import com.example.hp.groupchat.shared.PackData;
+import com.example.hp.groupchat.shared.Message;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -25,7 +25,6 @@ public class ChatServerThread extends Thread {
 
     private ChatServer server;
     private Socket socket;
-    private int ID;
     private String userName;
     private ObjectInputStream streamIn;
     private ObjectOutputStream streamOut;
@@ -36,11 +35,10 @@ public class ChatServerThread extends Thread {
         server = _server;
         socket = _socket;
        
-        this.ID = socket.getPort();
         statusConnection = true;
     }
 
-    public void send(PackData msg) throws Throwable {
+    public void send(Message msg) throws Throwable {
         try {
            // streamOut = new ObjectOutputStream(socket.getOutputStream());
 
@@ -48,18 +46,10 @@ public class ChatServerThread extends Thread {
             //  streamOut.flush();
             System.out.println(server.getCurrentDate() + " From " + msg.getFrom() + " to " + userName);
         } catch (IOException ioe) {
-            System.out.println(server.getCurrentDate() + " " + ID + " ERROR sending: " + ioe.getMessage());
-            server.remove(ID);
+            System.out.println(server.getCurrentDate() + " " + userName + " ERROR sending: " + ioe.getMessage());
+            server.remove(userName);
             stop();
         }
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
     }
 
     public String getUserName() {
@@ -67,34 +57,33 @@ public class ChatServerThread extends Thread {
     }
 
     public void run() {
-        System.out.println(server.getCurrentDate() + " Server Thread " + ID + " open socket.");
+        System.out.println(server.getCurrentDate() + " Server Thread " + userName + " open socket.");
         try {
             open();
         } catch (IOException ex) {
-            System.out.println(server.getCurrentDate() + " " + ID + " ERROR reading nick: " + ex.getMessage());
+            System.out.println(server.getCurrentDate() + " " + userName + " ERROR reading nick: " + ex.getMessage());
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ChatServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(server.getCurrentDate() + " Server Thread " + ID + " running.");
+        System.out.println(server.getCurrentDate() + " Server Thread " + userName + " running.");
         while ( !socket.isClosed()) {
             try {
-                PackData pack = (PackData) streamIn.readObject();
-                pack.setPort_ID(ID);
+                Message pack = (Message) streamIn.readObject();
                 server.handle(pack);
             } catch (IOException ioe) {
                 try {
-                    System.out.println(server.getCurrentDate() + " " + ID + " ERROR reading: " + ioe.getMessage());
+                    System.out.println(server.getCurrentDate() + " " + userName + " ERROR reading: " + ioe.getMessage());
                     
                     closeStreams();
-                    //server.remove(ID);
+                    //server.remove(userName);
                     
-                    System.out.println(server.getCurrentDate() + " " + ID + " is  remove: " + ioe.getMessage());
+                    System.out.println(server.getCurrentDate() + " " + userName + " is  remove: " + ioe.getMessage());
                 } catch (IOException ex) {
                     Logger.getLogger(ChatServerThread.class.getName()).log(Level.SEVERE, null, ex);
                 }
 
             } catch (Throwable ex) {
-                System.out.println(server.getCurrentDate() + " " + ID + " Error " + ex.getMessage());
+                System.out.println(server.getCurrentDate() + " " + userName + " Error " + ex.getMessage());
             }
         }
     }
@@ -108,9 +97,9 @@ public class ChatServerThread extends Thread {
 
         streamIn = new ObjectInputStream((socket.getInputStream()));
         streamOut = new ObjectOutputStream(socket.getOutputStream());
-        PackData pack = (PackData) streamIn.readObject();
+        Message pack = (Message) streamIn.readObject();
         userName = pack.getFrom();
-        PackData grettings = new PackData(KeyWordSystem._Bot, KeyWordSystem.Text_Only, KeyWordSystem._Bot + " Welcome " + userName + "!");
+        Message grettings = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, KeyWordSystem.BOT_NAME + " Welcome " + userName + "!");
         streamOut.writeObject(grettings);
     }
 

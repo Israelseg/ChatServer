@@ -5,7 +5,7 @@
  */
 package chatclient;
 
-import com.example.hp.groupchat.shared.PackData;
+import com.example.hp.groupchat.shared.Message;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -53,7 +53,7 @@ public class ChatClientThread extends Thread {
         boolean flag=true;
         while (flag) {
             try {
-                PackData pack=(PackData) streamIn.readObject();
+                Message pack=(Message) streamIn.readObject();
                 client.handle(pack);
                 
             } catch (IOException ioe) {

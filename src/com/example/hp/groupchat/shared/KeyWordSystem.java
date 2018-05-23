@@ -5,19 +5,36 @@
  */
 package com.example.hp.groupchat.shared;
 
+
 /**
- *
  * @author hp
  */
 public class KeyWordSystem {
+    /*
+        Status connection
+     */
+    public static final int CONNECTED = 0;//"_Server_Connected#";
+    public static final int CLOSE_CONNECTION = -1;// "_Close_Connection#";
 
-    public static String Close_Connection = "_Close_Connection#";
-    public static String File_Transfer = "_File_Transfer#";
-    public static String Connected = "_Server_Connected#";
-    public static String Text_Only = "_Only_Text#";
-    public static String _Bot = "Bot: ";
-    public static String Disconnected = " has disconnected";
-    public static String UserConnected = " has connected";
-    public static String Response = "Response#";
+
+    /*
+        Messages types
+     */
+    public static final int TYPE_TEXT = 1;
+    public static final int TYPE_QUERY = 2;//"Query#";
+    public static final int TYPE_QUERY_RESULT = 3;//"Qu"
+    public static final int TYPE_IMG = 4;//"_File_Transfer#";
+    public static final int TYPE_JSON = 5;
+    public static final int TYPE_SET_ID = 6;
+
+
+    /*
+        Generic text
+     */
+    public static final String BOT_NAME = "Bot";
+    public static final String MSG_DISCONNECTED = " has disconnected";
+    public static final String MSG_CONNECTED = " has connected";
+
 
 }
+

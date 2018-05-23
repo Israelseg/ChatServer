@@ -10,8 +10,7 @@ package chatclient;
  * @author hp
  */
 import com.example.hp.groupchat.shared.KeyWordSystem;
-import static com.example.hp.groupchat.shared.KeyWordSystem.Close_Connection;
-import com.example.hp.groupchat.shared.PackData;
+import com.example.hp.groupchat.shared.Message;
 import java.net.*;
 import java.io.*;
 import java.applet.*;
@@ -57,7 +56,7 @@ public class ChatClient extends Applet {
 
     public boolean action(Event e, Object o) {
         if (e.target == quit) {
-            input.setText(KeyWordSystem.Close_Connection);
+            input.setText(""+KeyWordSystem.CLOSE_CONNECTION);
             send();
             quit.disable();
             send.disable();
@@ -91,11 +90,11 @@ public class ChatClient extends Applet {
     private void send() {
         try {
             String txt = "";
-            if (input.getText().contains(Close_Connection)) {
+            if (input.getText().contains(""+KeyWordSystem.CLOSE_CONNECTION)) {
                 txt = "Bye... ";
             }
 
-            PackData pack = new PackData(user, (!txt.isEmpty()) ? KeyWordSystem.Close_Connection : KeyWordSystem.Text_Only, input.getText());
+            Message pack = new Message(user, (!txt.isEmpty()) ? KeyWordSystem.CLOSE_CONNECTION : KeyWordSystem.TYPE_TEXT, input.getText());
           //  streamOut = new ObjectOutputStream(socket.getOutputStream());
             streamOut.writeObject(pack);
             //streamOut.flush();
@@ -107,12 +106,12 @@ public class ChatClient extends Applet {
         }
     }
 
-    public void handle(PackData msg) {
-        if (msg.getType().equals(KeyWordSystem.Close_Connection)) {
+    public void handle(Message msg) {
+        if (msg.getType()==(KeyWordSystem.CLOSE_CONNECTION)) {
             println("Good bye. Press RETURN to exit ...");
             close();
         } else {
-            String txt = msg.getTime() + " - " + msg.getFrom() + ": " + msg.getText();
+            String txt = msg.getTime() + " - " + msg.getFrom() + ": " + msg.getMsg();
             println(txt);
         }
     }
@@ -120,7 +119,7 @@ public class ChatClient extends Applet {
     public void open() {
         try {
             streamOut = new ObjectOutputStream(socket.getOutputStream());
-            PackData pack = new PackData(user, KeyWordSystem.Connected, user + KeyWordSystem.UserConnected);
+            Message pack = new Message(user, KeyWordSystem.CONNECTED, user + KeyWordSystem.MSG_CONNECTED);
 
             streamOut.writeObject(pack);
             client = new ChatClientThread(this, socket);

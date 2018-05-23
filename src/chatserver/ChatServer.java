@@ -6,7 +6,7 @@
 package chatserver;
 
 import com.example.hp.groupchat.shared.KeyWordSystem;
-import com.example.hp.groupchat.shared.PackData;
+import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -31,8 +31,8 @@ import java.util.logging.Logger;
 public class ChatServer implements Runnable {
 
     // private ChatServerThread clients[] = new ChatServerThread[50];
-    private ConcurrentHashMap<Integer, ChatServerThread> clients;
-    private LinkedBlockingQueue<PackData> messageStack;
+    private ConcurrentHashMap<String, ChatServerThread> clients;
+    private LinkedBlockingQueue<Message> messageStack;
 
     private ServerSocket server = null;
     private Thread thread = null;
@@ -70,33 +70,32 @@ public class ChatServer implements Runnable {
     }
 
     /*
-        PackData is added  to messageStack when it is different to the type close
+        Message is added  to messageStack when it is different to the type close
         For the type text only, is broadcast directly otherwise is process in 
         Server Manager.
      */
-    public synchronized void handle(PackData pack) throws Throwable {
+    public synchronized void handle(Message pack) throws Throwable {
 
-        if (pack.getType().equals(KeyWordSystem.Close_Connection)) {
-            PackData msg = new PackData(clients.get(pack.getPort_ID()).getUserName(), KeyWordSystem.Disconnected, KeyWordSystem._Bot + pack.getFrom() + " " + KeyWordSystem.Disconnected);
+        if (pack.getType()==(KeyWordSystem.CLOSE_CONNECTION)) {
+            Message msg = new Message(clients.get(pack.getFrom()).getUserName(), KeyWordSystem.CLOSE_CONNECTION, KeyWordSystem.BOT_NAME + pack.getFrom() + " " + KeyWordSystem.MSG_DISCONNECTED);
             // clients.get(pack.getID()).getUserName(), KeyWordSystem.Disconnected;
             broadcastInfo(pack);
-            clients.get(pack.getPort_ID()).send(msg);
-            remove(pack.getPort_ID());
-        } else if (!pack.getType().equals(KeyWordSystem.Response)) {
+            clients.get(pack.getFrom()).send(msg);
+            remove(pack.getFrom());
+        } else if ( pack.getType()!=KeyWordSystem.TYPE_QUERY || pack.getType()!=KeyWordSystem.TYPE_QUERY_RESULT ) {
             messageStack.add(pack);
-            ChatServerThread from = clients.get(pack.getPort_ID());
+            ChatServerThread from = clients.get(pack.getFrom());
             Iterator<ChatServerThread> iterator = clients.values().iterator();
             while (iterator.hasNext()) {
                 ChatServerThread value = iterator.next();
-                if (pack.getPort_ID() != value.getID()) {
-                    System.out.println(pack.getPort_ID() + " - " + value.getID());
+                if (pack.getFrom().equals(value.getUserName())) {
                     value.send(pack);
                 }
             }
         }
     }
 
-    public synchronized void remove(int ID) {
+    public synchronized void remove(String ID) {
 
         ChatServerThread toTerminate = clients.get(ID);
         String usr = toTerminate.getUserName();
@@ -113,7 +112,7 @@ public class ChatServer implements Runnable {
 
         ChatServerThread value = new ChatServerThread(this, socket);
         value.start();
-        clients.put(value.getID(), value);
+        clients.put(value.getUserName(), value);
 
     }
 
@@ -137,7 +136,7 @@ public class ChatServer implements Runnable {
         }
     }
 
-    public void broadcastInfo(PackData pack) {
+    public void broadcastInfo(Message pack) {
         Iterator<ChatServerThread> iterator = clients.values().iterator();
         while (iterator.hasNext()) {
             try {
@@ -154,7 +153,7 @@ public class ChatServer implements Runnable {
         return server;
     }
 
-    public LinkedBlockingQueue<PackData> getMessageStack() {
+    public LinkedBlockingQueue<Message> getMessageStack() {
         return messageStack;
     }
 

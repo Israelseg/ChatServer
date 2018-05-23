@@ -6,10 +6,8 @@
 package chatserver;
 
 import com.example.hp.groupchat.shared.KeyWordSystem;
-import com.example.hp.groupchat.shared.PackData;
+import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
-import com.sun.xml.internal.messaging.saaj.util.Base64;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -18,7 +16,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 
 /**
  *
@@ -27,8 +24,8 @@ import javax.imageio.ImageIO;
 public class ServerManagerThread implements Runnable {
 
     private final ChatServer chatServer;
-    private ArrayList<PackData> pds;
-    private PackData packData;
+    private ArrayList<Message> pds;
+    private Message packData;
     private MessageAnalyzer messageAnalyzer;
     private final String pathDirectory = "/home/hp/NetBeansProjects/ChatServer/src/imgUsers";
 
@@ -43,10 +40,10 @@ public class ServerManagerThread implements Runnable {
         while (true) {
             try {
                 packData = chatServer.getMessageStack().take();
-                if (packData.getType().equals(KeyWordSystem.File_Transfer)) {
+                if (packData.getType()==(KeyWordSystem.TYPE_IMG)) {
                     new Thread(new saveFileRunnable(packData)).start();
                 } else {
-                    messageAnalyzer = new MessageAnalyzer(packData.getText());
+                    messageAnalyzer = new MessageAnalyzer(packData.getMsg());
                     /* 
                     Switch: action to take
                     default nothing
@@ -54,7 +51,7 @@ public class ServerManagerThread implements Runnable {
                     String actionString = messageAnalyzer.getAction();
                     if (!actionString.equals(messageAnalyzer.Nothing)) {
                         System.out.println(ServerUtils.dateLog() + " " + actionString);
-                        PackData responseServer = new PackData(KeyWordSystem._Bot, KeyWordSystem.Response, actionString);
+                        Message responseServer = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, actionString);
                         chatServer.broadcastInfo(responseServer);
                     }
 
@@ -70,9 +67,9 @@ public class ServerManagerThread implements Runnable {
 
     private class saveFileRunnable implements Runnable {
 
-        private final PackData pd;
+        private final Message pd;
 
-        public saveFileRunnable(PackData data) {
+        public saveFileRunnable(Message data) {
             this.pd = data;
         }
 
