@@ -34,13 +34,11 @@ public class ChatServerThread extends Thread {
         super();
         server = _server;
         socket = _socket;
-       
-        statusConnection = true;
     }
 
     public void send(Message msg) throws Throwable {
         try {
-           // streamOut = new ObjectOutputStream(socket.getOutputStream());
+            // streamOut = new ObjectOutputStream(socket.getOutputStream());
 
             streamOut.writeObject(msg);
             //  streamOut.flush();
@@ -48,7 +46,7 @@ public class ChatServerThread extends Thread {
         } catch (IOException ioe) {
             System.out.println(server.getCurrentDate() + " " + userName + " ERROR sending: " + ioe.getMessage());
             server.remove(userName);
-            stop();
+            statusConnection = false;
         }
     }
 
@@ -57,26 +55,28 @@ public class ChatServerThread extends Thread {
     }
 
     public void run() {
-        System.out.println(server.getCurrentDate() + " Server Thread " + userName + " open socket.");
         try {
             open();
+            System.out.println(server.getCurrentDate() + " Server Thread " + userName + " open socket.");
         } catch (IOException ex) {
             System.out.println(server.getCurrentDate() + " " + userName + " ERROR reading nick: " + ex.getMessage());
+            statusConnection = false;
+
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ChatServerThread.class.getName()).log(Level.SEVERE, null, ex);
         }
         System.out.println(server.getCurrentDate() + " Server Thread " + userName + " running.");
-        while ( !socket.isClosed()) {
+        while (statusConnection) {
             try {
                 Message pack = (Message) streamIn.readObject();
                 server.handle(pack);
             } catch (IOException ioe) {
                 try {
                     System.out.println(server.getCurrentDate() + " " + userName + " ERROR reading: " + ioe.getMessage());
-                    
+
                     closeStreams();
                     //server.remove(userName);
-                    
+
                     System.out.println(server.getCurrentDate() + " " + userName + " is  remove: " + ioe.getMessage());
                 } catch (IOException ex) {
                     Logger.getLogger(ChatServerThread.class.getName()).log(Level.SEVERE, null, ex);
@@ -84,16 +84,19 @@ public class ChatServerThread extends Thread {
 
             } catch (Throwable ex) {
                 System.out.println(server.getCurrentDate() + " " + userName + " Error " + ex.getMessage());
+                server.remove(userName);
+                statusConnection=false;
             }
         }
     }
 
     public void inputRead(Socket socket) {
         this.socket = socket;
-        this.run();
+        this.start();
     }
 
     private void open() throws IOException, ClassNotFoundException {
+        statusConnection = true;
 
         streamIn = new ObjectInputStream((socket.getInputStream()));
         streamOut = new ObjectOutputStream(socket.getOutputStream());
@@ -101,11 +104,12 @@ public class ChatServerThread extends Thread {
         userName = pack.getFrom();
         Message grettings = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, KeyWordSystem.BOT_NAME + " Welcome " + userName + "!");
         streamOut.writeObject(grettings);
+        server.addUser(this);
     }
 
     private void closeStreams() throws IOException {
         if (socket != null) {
-            
+
             socket.close();
         }
         if (streamIn != null) {
@@ -114,6 +118,7 @@ public class ChatServerThread extends Thread {
         if (streamOut != null) {
             streamOut.close();
         }
+        statusConnection=false;
     }
 
     public boolean getStatusConnection() {

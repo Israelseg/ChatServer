@@ -60,8 +60,7 @@ public class ChatServer implements Runnable {
         while (thread != null) {
             try {
                 System.out.println(getCurrentDate() + " Waiting for a client ...");
-
-                addThread(server.accept());
+                new ChatServerThread(this, server.accept()).start();
             } catch (IOException ioe) {
                 System.out.println(getCurrentDate() + " Server accept error: " + ioe);
                 stop();
@@ -76,19 +75,19 @@ public class ChatServer implements Runnable {
      */
     public synchronized void handle(Message pack) throws Throwable {
 
-        if (pack.getType()==(KeyWordSystem.CLOSE_CONNECTION)) {
+        if (pack.getType() == (KeyWordSystem.CLOSE_CONNECTION)) {
             Message msg = new Message(clients.get(pack.getFrom()).getUserName(), KeyWordSystem.CLOSE_CONNECTION, KeyWordSystem.BOT_NAME + pack.getFrom() + " " + KeyWordSystem.MSG_DISCONNECTED);
             // clients.get(pack.getID()).getUserName(), KeyWordSystem.Disconnected;
             broadcastInfo(pack);
             clients.get(pack.getFrom()).send(msg);
             remove(pack.getFrom());
-        } else if ( pack.getType()!=KeyWordSystem.TYPE_QUERY || pack.getType()!=KeyWordSystem.TYPE_QUERY_RESULT ) {
+        } else if (pack.getType() != KeyWordSystem.TYPE_QUERY || pack.getType() != KeyWordSystem.TYPE_QUERY_RESULT) {
             messageStack.add(pack);
             ChatServerThread from = clients.get(pack.getFrom());
             Iterator<ChatServerThread> iterator = clients.values().iterator();
             while (iterator.hasNext()) {
                 ChatServerThread value = iterator.next();
-                if (pack.getFrom().equals(value.getUserName())) {
+                if (!pack.getFrom().equals(value.getUserName())) {
                     value.send(pack);
                 }
             }
@@ -104,16 +103,6 @@ public class ChatServer implements Runnable {
         clients.remove(ID);
 
         System.out.println(getCurrentDate() + " Current members " + Arrays.asList(clients.values().toArray()));
-    }
-
-    private void addThread(Socket socket) {
-
-        System.out.println(getCurrentDate() + " Client accepted: " + socket);
-
-        ChatServerThread value = new ChatServerThread(this, socket);
-        value.start();
-        clients.put(value.getUserName(), value);
-
     }
 
     public String getCurrentDate() {
@@ -155,6 +144,10 @@ public class ChatServer implements Runnable {
 
     public LinkedBlockingQueue<Message> getMessageStack() {
         return messageStack;
+    }
+
+    public void addUser(ChatServerThread value) {
+        clients.put(value.getUserName(), value);
     }
 
     public static void main(String args[]) {
