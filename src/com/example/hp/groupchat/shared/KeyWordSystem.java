@@ -5,11 +5,11 @@
  */
 package com.example.hp.groupchat.shared;
 
-
 /**
  * @author hp
  */
 public class KeyWordSystem {
+
     /*
         Status connection
      */
@@ -26,7 +26,12 @@ public class KeyWordSystem {
     public static final int TYPE_IMG = 4;//"_File_Transfer#";
     public static final int TYPE_JSON = 5;
     public static final int TYPE_SET_ID = 6;
+    public static final int TYPE_LOCATION=7;
 
+    /*
+        Command
+     */
+    public static final String COMMAND_LOCATION = "LOCATION";
 
     /*
         Generic text
@@ -35,6 +40,4 @@ public class KeyWordSystem {
     public static final String MSG_DISCONNECTED = " has disconnected";
     public static final String MSG_CONNECTED = " has connected";
 
-
 }
-

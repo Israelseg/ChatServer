@@ -5,9 +5,12 @@
  */
 package chatserver;
 
+import com.example.hp.groupchat.shared.DataBundle;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,22 +43,51 @@ public class ServerManagerThread implements Runnable {
         while (true) {
             try {
                 packData = chatServer.getMessageStack().take();
-                if (packData.getType()==(KeyWordSystem.TYPE_IMG)) {
-                    new Thread(new saveFileRunnable(packData)).start();
-                } else {
-                    messageAnalyzer = new MessageAnalyzer(packData.getMsg());
-                    /* 
-                    Switch: action to take
-                    default nothing
-                     */
-                    String actionString = messageAnalyzer.getAction();
-                    if (!actionString.equals(messageAnalyzer.Nothing)) {
-                        System.out.println(ServerUtils.dateLog() + " " + actionString);
-                        Message responseServer = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, actionString);
-                        chatServer.broadcastInfo(responseServer);
-                    }
+                switch (packData.getType()) {
+                    case KeyWordSystem.TYPE_IMG:
+                        new Thread(new saveFileRunnable(packData)).start();
+                        break;
+                    case KeyWordSystem.TYPE_TEXT: {
+                        messageAnalyzer = new MessageAnalyzer(packData.getMsg());
+                        String[] messageAction = messageAnalyzer.getAction();
 
+                        switch (messageAction[0]) {
+
+                            case MessageAnalyzer.TYPE_LOCATE:
+                            case MessageAnalyzer.TYPE_LOCATE_ITCM:
+                                Message msgMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, messageAction[1]);
+                                chatServer.broadcastInfo(msgMessage);
+                                break;
+                            case MessageAnalyzer.TYPE_ENTERTAINMENT:
+                                Message responseMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY, "Escriba la opción que requiera para buscar:");
+                                GsonBuilder gsonBuilder = new GsonBuilder();
+                                Gson gson = gsonBuilder.create();
+                                DataBundle dataBundle = new DataBundle();
+                                dataBundle.setCommand(MessageAnalyzer.TYPE_ENTERTAINMENT);
+                                dataBundle.setOptions(MessageAnalyzer.OPTIONS_ENTERTAINMENT);
+                                dataBundle.setCommand(KeyWordSystem.COMMAND_LOCATION);
+                                String toJson = gson.toJson(dataBundle);
+                                responseMessage.setJsonString(toJson);
+                                chatServer.broadcastInfo(responseMessage);
+                                break;
+                            case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
+                                System.out.println(messageAction[0] + " " + messageAction[1]);
+                                break;
+                            case MessageAnalyzer.NOTHING:
+                            default:
+                                Message responseServer = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, "Lo siento, no puedo procesar tu consulta");
+                                chatServer.broadcastInfo(responseServer);
+                                break;
+                        }
+                    }
+                    break;
+                    case KeyWordSystem.TYPE_LOCATION:
+                        System.out.println(packData);
+                        break;
+                    default:
+                        System.out.println(packData);
                 }
+
                 pds.add(packData);
             } catch (InterruptedException ex) {
                 System.out.println(chatServer.getCurrentDate() + " Error save data " + ex.getMessage());

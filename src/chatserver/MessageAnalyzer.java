@@ -8,6 +8,7 @@ package chatserver;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -22,22 +23,38 @@ public class MessageAnalyzer {
         * When? (¿Cuándo?)
         * Who? (¿Quién?)
         * Where? (¿Dónde?)
-        * why or for what? (¿Por qué o para qué?)
+        * WHY or for WHAT? (¿Por qué o para qué?)
 
      */
-    private static final String what = "Qué";
-    private static final String how = "Cómo";
-    private static final String when = "Cuándo";
-    private static final String who = "Quién";
-    private static final String where = "Dónde";
-    private static final String why = "Por qué";
-    private static final String esta = "esta";
+    //Generales
+    private static final String WHAT = "Qué";
+    private static final String HOW = "Cómo";
+    private static final String WHEN = "Cuándo";
+    private static final String WHO = "Quién";
+    private static final String WHERE = "Dónde";
+    private static final String WHY = "Por qué";
+    private static final String ESTA = "ESTA";
     private static final String ITCM[] = {"ITCM", "TEC", "salon", "ISC", "IQ",
         "IGE", "MEC", "PET", "AMB", "TICS", "FF", "EE", "T2"};
-    public static final String Nothing = "Nothing to do";
+    public static final String NOTHING = "Nothing to do";
+
+    public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
+        "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", "PARK ",
+        "SPA ", "ZOO ", "POINT_OF_INTEREST"};
+    public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
+        "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE",
+        "NightClub", "PARQUE", "SPA", "ZOOLOGICO", "PDI"};
     private final Collator collator;
 
     private String text;
+
+    /*
+        Types response
+     */
+    public static final String TYPE_LOCATE = "LOCATE#";
+    public static final String TYPE_LOCATE_ITCM = "LOCATE_ITCM#";
+    public static final String TYPE_ENTERTAINMENT = "ENTERTAINMENT#";
+    public static final String TYPE_TAG_ENTERTAINMENT = "TYPE_ENTERTAINMENT#";
 
     public MessageAnalyzer(String msg) {
         collator = Collator.getInstance();
@@ -46,33 +63,76 @@ public class MessageAnalyzer {
         this.text = replaceWords(tokens);
     }
 
-    public String getAction() {
+    public String[] getAction() {
+        String[] action = new String[2];
         String response = "";
         int locating = isLocating();
-        System.out.println(text + " " + locating);
+        int entertainment;
+        String entertainmentPlaces;
 
         if (locating != -1) {
-            response += "Locate ";
             String aboutTec = isAboutTec();
             if (!aboutTec.isEmpty()) {
-                response += aboutTec;
+                action[0] = TYPE_LOCATE_ITCM;
+                action[1] = aboutTec;
+                return action;
             } else {
-                response += text.substring(locating);
+                action[0] = TYPE_LOCATE;
+                action[1] = text.substring(locating);
+                return action;
             }
+        } else if ((entertainment = isEntertainment()) != -1) {
+            action[0] = TYPE_ENTERTAINMENT;
+            action[1] = text.substring(entertainment);
+            return action;
+        } else if (!(entertainmentPlaces = isEntertainmentPlaces()).isEmpty()) {
+            action[0] = TYPE_TAG_ENTERTAINMENT;
+            action[1] = entertainmentPlaces;
+            return action;
+        } else {
+            action[0] = NOTHING;
+            action[1] = NOTHING;
+            return action;
         }
-        return (response.isEmpty()) ? Nothing : response;
     }
 
     private int isLocating() {
 
         if (text.matches(".*Dónde.+")) {
-            return text.indexOf(where);
+            return text.indexOf(WHERE);
         } else if (text.matches(".*Cómo llego a?.+")) {
-            return text.indexOf(how);
+            return text.indexOf(HOW);
         } else {
             return -1;
         }
 
+    }
+
+    private int isEntertainment() {
+
+        if (text.matches(".*Lugares de entretenimiento.*")) {
+            return text.indexOf("Lugares");
+        } else {
+            return -1;
+        }
+    }
+
+    private String isEntertainmentPlaces() {
+        StringBuilder stringContains = new StringBuilder();
+        String[] textSplit = text.split(" ");
+
+        for (String tokenText : textSplit) {
+
+            for (String _places : ENTERTAINMENT_WORDS) {
+                if (collator.compare(tokenText.trim(), _places.trim()) == 0 || tokenText.trim().equalsIgnoreCase(_places.trim())) {
+                    stringContains.append(tokenText).append(" ");
+                }
+            }
+            if (tokenText.equalsIgnoreCase("cercano") || tokenText.equalsIgnoreCase("cercanos")) {
+                stringContains.append("cercano").append(" ");
+            }
+        }
+        return stringContains.toString();
     }
 
     private String isAboutTec() {
@@ -117,26 +177,27 @@ public class MessageAnalyzer {
                 split.add(string);
             }
         }
+
         return split;
     }
 
     private String replaceWords(ArrayList<String> tokens) {
         StringBuilder builder = new StringBuilder();
         tokens.forEach((token) -> {
-            if (collator.compare(token, what) == 0) {
-                builder.append(what).append(" ");
-            } else if (collator.compare(token, how) == 0) {
-                builder.append(how).append(" ");
-            } else if (collator.compare(token, when) == 0) {
-                builder.append(when).append(" ");
-            } else if (collator.compare(token, who) == 0) {
-                builder.append(who).append(" ");
-            } else if (collator.compare(token, where) == 0) {
-                builder.append(where).append(" ");
-            } else if (collator.compare(token, why) == 0) {
-                builder.append(why).append(" ");
-            } else if (collator.compare(token, esta) == 0) {
-                builder.append(esta).append(" ");
+            if (collator.compare(token, WHAT) == 0) {
+                builder.append(WHAT).append(" ");
+            } else if (collator.compare(token, HOW) == 0) {
+                builder.append(HOW).append(" ");
+            } else if (collator.compare(token, WHEN) == 0) {
+                builder.append(WHEN).append(" ");
+            } else if (collator.compare(token, WHO) == 0) {
+                builder.append(WHO).append(" ");
+            } else if (collator.compare(token, WHERE) == 0) {
+                builder.append(WHERE).append(" ");
+            } else if (collator.compare(token, WHY) == 0) {
+                builder.append(WHY).append(" ");
+            } else if (collator.compare(token, ESTA) == 0) {
+                builder.append(ESTA).append(" ");
             } else {
                 boolean almostOne = false;
                 for (String _itcm : ITCM) {
@@ -145,9 +206,17 @@ public class MessageAnalyzer {
                         almostOne = true;
                     }
                 }
+                for (int i = 0; i < OPTIONS_ENTERTAINMENT.length; i++) {
+                    String _places = OPTIONS_ENTERTAINMENT[i];
+                    if (collator.compare(token, _places) == 0 || token.trim().equalsIgnoreCase(_places.trim())) {
+                        builder.append(ENTERTAINMENT_WORDS[i]).append(" ");
+                        almostOne = true;
+                    }
+                }
                 if (!almostOne) {
                     builder.append(token).append(" ");
                 }
+
             }
         });
         return builder.toString();
@@ -163,8 +232,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        MessageAnalyzer messageHandler = new MessageAnalyzer("Hola amigos, donde esta "
-                + "el tec de madero?");
+        MessageAnalyzer messageHandler = new MessageAnalyzer("parque");
         System.out.println(messageHandler.getAction());
     }
 }
