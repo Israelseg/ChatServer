@@ -5,12 +5,12 @@
  */
 package chatserver;
 
-import com.example.hp.groupchat.shared.DataBundle;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import entertainmentPlaces.PlaceEntertainment;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,19 +59,16 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(msgMessage);
                                 break;
                             case MessageAnalyzer.TYPE_ENTERTAINMENT:
-                                Message responseMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY, "Escriba la opción que requiera para buscar:");
-                                GsonBuilder gsonBuilder = new GsonBuilder();
-                                Gson gson = gsonBuilder.create();
-                                DataBundle dataBundle = new DataBundle();
-                                dataBundle.setCommand(MessageAnalyzer.TYPE_ENTERTAINMENT);
-                                dataBundle.setOptions(MessageAnalyzer.OPTIONS_ENTERTAINMENT);
-                                dataBundle.setCommand(KeyWordSystem.COMMAND_LOCATION);
-                                String toJson = gson.toJson(dataBundle);
-                                responseMessage.setJsonString(toJson);
+                                String text="Escriba la opción que requiera para buscar:";
+                                for(String s:MessageAnalyzer.OPTIONS_ENTERTAINMENT){
+                                    text+="\n\t·"+s;
+                                }
+                                Message responseMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, text);
+                                
                                 chatServer.broadcastInfo(responseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
-                                System.out.println(messageAction[0] + " " + messageAction[1]);
+                                new PlaceEntertainment(messageAction[1],chatServer.getClients().get(packData.getFrom())).start();
                                 break;
                             case MessageAnalyzer.NOTHING:
                             default:

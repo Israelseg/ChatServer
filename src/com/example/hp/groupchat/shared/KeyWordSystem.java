@@ -27,6 +27,7 @@ public class KeyWordSystem {
     public static final int TYPE_JSON = 5;
     public static final int TYPE_SET_ID = 6;
     public static final int TYPE_LOCATION=7;
+    public static final int TYPE_MAP=8;
 
     /*
         Command

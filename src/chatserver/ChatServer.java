@@ -150,6 +150,11 @@ public class ChatServer implements Runnable {
         clients.put(value.getUserName(), value);
     }
 
+    public ConcurrentHashMap<String, ChatServerThread> getClients() {
+        return clients;
+    }
+    
+
     public static void main(String args[]) {
         ChatServer server = null;
 

@@ -29,6 +29,7 @@ public class ChatServerThread extends Thread {
     private ObjectInputStream streamIn;
     private ObjectOutputStream streamOut;
     private boolean statusConnection;
+    private String location;
 
     public ChatServerThread(ChatServer _server, Socket _socket) {
         super();
@@ -69,7 +70,13 @@ public class ChatServerThread extends Thread {
         while (statusConnection) {
             try {
                 Message pack = (Message) streamIn.readObject();
-                server.handle(pack);
+                if (pack.getType() != KeyWordSystem.TYPE_LOCATION) {
+                    server.handle(pack);
+                } else {
+                    location = pack.getMsg();
+                    System.out.println(userName+" -> "+location);
+                }
+
             } catch (IOException ioe) {
                 try {
                     System.out.println(server.getCurrentDate() + " " + userName + " ERROR reading: " + ioe.getMessage());
@@ -85,7 +92,7 @@ public class ChatServerThread extends Thread {
             } catch (Throwable ex) {
                 System.out.println(server.getCurrentDate() + " " + userName + " Error " + ex.getMessage());
                 server.remove(userName);
-                statusConnection=false;
+                statusConnection = false;
             }
         }
     }
@@ -118,11 +125,15 @@ public class ChatServerThread extends Thread {
         if (streamOut != null) {
             streamOut.close();
         }
-        statusConnection=false;
+        statusConnection = false;
     }
 
     public boolean getStatusConnection() {
         return this.statusConnection;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public void setStatusConnection(boolean statusConnection) throws IOException {
