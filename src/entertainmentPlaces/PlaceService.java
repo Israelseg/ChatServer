@@ -188,8 +188,13 @@ public class PlaceService {
     public static void main(String[] args) {
         double lat = 22.307234, lng = -97.888767;
 
-        byte[] staticMap = PlaceService.staticMap(lat, lng, 14);
-        System.out.println(staticMap);
+        JSONArray searchByType = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000);
+        JSONObject jsonObject = searchByType.getJSONObject(0);
+        System.out.println(jsonObject.getString("name"));
+        JSONObject location = jsonObject.getJSONObject("geometry").getJSONObject("location");
+        System.out.println(location.getDouble("lat"));
+        System.out.println(location.getDouble("lng"));
+
     }
     /*
     Table 1: Types supported in place search and addition

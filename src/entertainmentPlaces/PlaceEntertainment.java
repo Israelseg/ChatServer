@@ -29,13 +29,14 @@ public class PlaceEntertainment extends Thread {
     @Override
     public void run() {
         double lat = 22.307234, lng = -97.888767;
-        int radius = 2500;
+        int radius = 2000;
         if (user.getLocation() != null) {
             String[] split = user.getLocation().split(",");
             lat = Double.parseDouble(split[0]);
             lng = Double.parseDouble(split[1]);
         }
         JSONArray searchByType = PlaceService.searchByType(order.toLowerCase().trim(), lat, lng,  radius);
+        System.out.println(searchByType.length());
         Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, searchByType.toString());
         response.setContent(PlaceService.staticMap(lat, lng, 14));
         try {
