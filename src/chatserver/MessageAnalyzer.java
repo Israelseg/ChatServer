@@ -45,6 +45,17 @@ public class MessageAnalyzer {
     public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
         "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
         "SPA", "ZOOLOGICO", "PDI"};
+    //office keywords
+    public static final String OFICINAS_WORDS[] = {"COMPUTING_CENTER", "TEC_MANAG",
+        "RR_HH", "STUNDENT_SERVICES", "SCHOOL_SERVICES", "PLANNING",
+        "COMUNICATION_Y_DIFFUSION", "FINANCIAL_RESOURCES", "ADMIN_SERV_SUBADMIN", "ACADEMIC_SUBDIREC",
+        "ACADEMIC_DIRECTION", "BOARDROOM", "SPORTS_COORD", "STUDENT_COUNCIL", "DIVISION_OF_STUDIES",
+        "BASIC_SCIENCE_DEPT"};
+    public static final String OPTIONS_OFICINAS[] = {"CENTRO_COMPUTO", "GESTION_TEC_VINC",
+        "RECURSOS_HUMANOS", "SERVICIOS_ESTUDIANTILES", "SERVICIOS_ESCOLARES", "PLANEACION",
+        "COMUNICACION_Y_DIFUSION", "RECURSOS_FINANCIEROS", "SUBDIRECCION_SERV_ADM", "SUBDIRECCION_ACADEMICA",
+        "DIRECCION", "SALA_JUNTAS", "COORDINACION_DEPORTIVA", "CONSEJO_ESTUDIANTIL", "DIVISION_DE_ESTUDIOS",
+        "DPTO_CIENCIAS_BASICAS"};
     // banks keywords
     public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
         "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
@@ -64,6 +75,8 @@ public class MessageAnalyzer {
     public static final String TYPE_LOCATE_ITCM = "LOCATE_ITCM#";
     public static final String TYPE_ENTERTAINMENT = "ENTERTAINMENT#";
     public static final String TYPE_TAG_ENTERTAINMENT = "TYPE_ENTERTAINMENT#";
+    public static final String TYPE_OFICINAS = "OFICINAS#";
+    public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
 
     public MessageAnalyzer(String msg) {
         collator = Collator.getInstance();
@@ -78,6 +91,8 @@ public class MessageAnalyzer {
         int locating = isLocating();
         int entertainment;
         String entertainmentPlaces;
+        int oficinas;
+        String oficinasPlaces;
 
         if (locating != -1) {
             String aboutTec = isAboutTec();
@@ -97,6 +112,14 @@ public class MessageAnalyzer {
         } else if (!(entertainmentPlaces = isEntertainmentPlaces()).isEmpty()) {
             action[0] = TYPE_TAG_ENTERTAINMENT;
             action[1] = entertainmentPlaces;
+            return action;
+        } else if((oficinas = isOficinas()) != -1){
+            action[0] = TYPE_OFICINAS;
+            action[1] = text.substring(oficinas);
+            return action;
+        } else if (!(oficinasPlaces = isAboutOficinas()).isEmpty()) {
+            action[0] = TYPE_TAG_OFICINAS;
+            action[1] = oficinasPlaces;
             return action;
         } else {
             action[0] = NOTHING;
@@ -123,6 +146,14 @@ public class MessageAnalyzer {
         else 
             return -1;   
     }
+    
+    private int isOficinas(){
+        if (text.matches(".*Oficinas.*")){
+            return text.indexOf("Oficinas");
+        } else {
+            return -1;
+        }
+    }
 
     private String isEntertainmentPlaces() {
         StringBuilder stringContains = new StringBuilder();
@@ -137,6 +168,19 @@ public class MessageAnalyzer {
             }
             if (tokenText.equalsIgnoreCase("cercano") || tokenText.equalsIgnoreCase("cercanos")) {
                 stringContains.append("cercano").append(" ");
+            }
+        }
+        return stringContains.toString();
+    }
+    
+    private String isAboutOficinas(){
+        StringBuilder stringContains = new StringBuilder();
+        String[] textSplit = text.split(" ");
+        for (String tokenText : textSplit) {
+            for (String _oficinas : OFICINAS_WORDS) {
+                if (tokenText.contains(_oficinas)) {
+                    stringContains.append(tokenText).append(" ");
+                }
             }
         }
         return stringContains.toString();
@@ -226,6 +270,14 @@ public class MessageAnalyzer {
                         almostOne = true;
                     }
                 }
+                
+                for (String _oficinas : OPTIONS_OFICINAS) {
+                    if (collator.compare(token, _oficinas) == 0) {
+                        builder.append(_oficinas).append(" ");
+                        almostOne = true;
+                    }
+                }
+                
                 if (!almostOne) {
                     builder.append(token).append(" ");
                 }
@@ -244,7 +296,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        MessageAnalyzer messageHandler = new MessageAnalyzer("parque");
+        MessageAnalyzer messageHandler = new MessageAnalyzer("donde esta el centro de computo?");
         System.out.println(messageHandler.getAction());
     }
 }
