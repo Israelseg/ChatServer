@@ -34,16 +34,25 @@ public class MessageAnalyzer {
     private static final String WHERE = "Dónde";
     private static final String WHY = "Por qué";
     private static final String ESTA = "ESTA";
+    
+    // ITCM keywords
     private static final String ITCM[] = {"ITCM", "TEC", "salon", "ISC", "IQ",
         "IGE", "MEC", "PET", "AMB", "TICS", "FF", "EE", "T2"};
+    // entertaiment keywords
+    public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
+        "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", 
+        "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST"};
+    public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
+        "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
+        "SPA", "ZOOLOGICO", "PDI"};
+    // banks keywords
+    public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
+        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
+        "BANJERCITO ", "BANORTE "};
+    public static final String BANKS_SHOW_OPEN_OPTION[] = {"ABIERTOS"};
+    
     public static final String NOTHING = "Nothing to do";
 
-    public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
-        "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", "PARK ",
-        "SPA ", "ZOO ", "POINT_OF_INTEREST"};
-    public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
-        "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE",
-        "NightClub", "PARQUE", "SPA", "ZOOLOGICO", "PDI"};
     private final Collator collator;
 
     private String text;
@@ -105,16 +114,14 @@ public class MessageAnalyzer {
         } else {
             return -1;
         }
-
     }
-
+    
     private int isEntertainment() {
 
-        if (text.matches(".*Lugares de entretenimiento.*")) {
+        if (text.matches(".*Lugares de entretenimiento.*")) 
             return text.indexOf("Lugares");
-        } else {
-            return -1;
-        }
+        else 
+            return -1;   
     }
 
     private String isEntertainmentPlaces() {
@@ -138,6 +145,7 @@ public class MessageAnalyzer {
     private String isAboutTec() {
         StringBuilder stringContains = new StringBuilder();
         String[] textSplit = text.split(" ");
+        
         for (String tokenText : textSplit) {
             for (String _itcm : ITCM) {
                 if (tokenText.contains(_itcm)) {
@@ -200,15 +208,20 @@ public class MessageAnalyzer {
                 builder.append(ESTA).append(" ");
             } else {
                 boolean almostOne = false;
+                
                 for (String _itcm : ITCM) {
                     if (collator.compare(token, _itcm) == 0) {
                         builder.append(_itcm).append(" ");
                         almostOne = true;
                     }
                 }
+                
                 for (int i = 0; i < OPTIONS_ENTERTAINMENT.length; i++) {
+                    
                     String _places = OPTIONS_ENTERTAINMENT[i];
-                    if (collator.compare(token, _places) == 0 || token.trim().equalsIgnoreCase(_places.trim())) {
+                    if (collator.compare(token, _places) == 0 
+                        || token.trim().equalsIgnoreCase(_places.trim())) 
+                    {
                         builder.append(ENTERTAINMENT_WORDS[i]).append(" ");
                         almostOne = true;
                     }
@@ -216,7 +229,6 @@ public class MessageAnalyzer {
                 if (!almostOne) {
                     builder.append(token).append(" ");
                 }
-
             }
         });
         return builder.toString();
