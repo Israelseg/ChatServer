@@ -46,16 +46,16 @@ public class MessageAnalyzer {
         "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
         "SPA", "ZOOLOGICO", "PDI"};
     //office keywords
-    public static final String OFICINAS_WORDS[] = {"COMPUTING_CENTER", "TEC_MANAG",
-        "RR_HH", "STUNDENT_SERVICES", "SCHOOL_SERVICES", "PLANNING",
-        "COMUNICATION_Y_DIFFUSION", "FINANCIAL_RESOURCES", "ADMIN_SERV_SUBADMIN", "ACADEMIC_SUBDIREC",
-        "ACADEMIC_DIRECTION", "BOARDROOM", "SPORTS_COORD", "STUDENT_COUNCIL", "DIVISION_OF_STUDIES",
-        "BASIC_SCIENCE_DEPT"};
-    public static final String OPTIONS_OFICINAS[] = {"CENTRO_COMPUTO", "GESTION_TEC_VINC",
-        "RECURSOS_HUMANOS", "SERVICIOS_ESTUDIANTILES", "SERVICIOS_ESCOLARES", "PLANEACION",
-        "COMUNICACION_Y_DIFUSION", "RECURSOS_FINANCIEROS", "SUBDIRECCION_SERV_ADM", "SUBDIRECCION_ACADEMICA",
-        "DIRECCION", "SALA_JUNTAS", "COORDINACION_DEPORTIVA", "CONSEJO_ESTUDIANTIL", "DIVISION_DE_ESTUDIOS",
-        "DPTO_CIENCIAS_BASICAS"};
+    public static final String OFICINAS_WORDS[] = {"COMPUTINGCENTER", "TEC MANAG",
+        "RR HH", "STUNDENT SERVICES", "SCHOOL SERVICES", "PLANNING",
+        "COMUNICATION Y DIFFUSION", "FINANCIAL RESOURCES", "ADMIN SERV_SUBADMIN", "ACADEMIC SUBDIREC",
+        "ACADEMIC DIRECTION", "BOARDROOM", "SPORTS COORD", "STUDENT COUNCIL", "DIVISION OF STUDIES",
+        "BASIC SCIENCE DEPT"};
+    public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", "GESTION TEC VINC",
+        "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", "SERVICIOS ESCOLARES", "PLANEACION",
+        "COMUNICACION Y DIFUSION", "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
+        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", "DIVISION DE ESTUDIOS",
+        "DPTO CIENCIAS BASICAS"};
     // banks keywords
     public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
         "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
@@ -178,7 +178,7 @@ public class MessageAnalyzer {
         String[] textSplit = text.split(" ");
         for (String tokenText : textSplit) {
             for (String _oficinas : OFICINAS_WORDS) {
-                if (tokenText.contains(_oficinas)) {
+                if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0 || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) {
                     stringContains.append(tokenText).append(" ");
                 }
             }
@@ -271,9 +271,13 @@ public class MessageAnalyzer {
                     }
                 }
                 
-                for (String _oficinas : OPTIONS_OFICINAS) {
-                    if (collator.compare(token, _oficinas) == 0) {
-                        builder.append(_oficinas).append(" ");
+                for (int i = 0; i < OPTIONS_OFICINAS.length; i++) {
+                    
+                    String _oficinas = OPTIONS_OFICINAS[i];
+                    if (collator.compare(token, _oficinas) == 0 
+                        || token.trim().equalsIgnoreCase(_oficinas.trim())) 
+                    {
+                        builder.append(OFICINAS_WORDS[i]).append(" ");
                         almostOne = true;
                     }
                 }
@@ -296,7 +300,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        MessageAnalyzer messageHandler = new MessageAnalyzer("donde esta el centro de computo?");
-        System.out.println(messageHandler.getAction());
+        MessageAnalyzer messageHandler = new MessageAnalyzer("Centro_computo");
+        System.out.println(Arrays.toString(messageHandler.getAction()));
     }
 }
