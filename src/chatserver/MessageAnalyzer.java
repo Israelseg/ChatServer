@@ -48,14 +48,15 @@ public class MessageAnalyzer {
     //office keywords
     public static final String OFICINAS_WORDS[] = {"COMPUTINGCENTER", "TEC MANAG",
         "RR HH", "STUNDENT SERVICES", "SCHOOL SERVICES", "PLANNING",
-        "COMUNICATION Y DIFFUSION", "FINANCIAL RESOURCES", "ADMIN SERV_SUBADMIN", "ACADEMIC SUBDIREC",
-        "ACADEMIC DIRECTION", "BOARDROOM", "SPORTS COORD", "STUDENT COUNCIL", "DIVISION OF STUDIES",
-        "BASIC SCIENCE DEPT"};
-    public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", "GESTION TEC VINC",
-        "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", "SERVICIOS ESCOLARES", "PLANEACION",
-        "COMUNICACION Y DIFUSION", "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
-        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", "DIVISION DE ESTUDIOS",
-        "DPTO CIENCIAS BASICAS"};
+        "COMUNICATION Y DIFFUSION", "FINANCIAL RESOURCES", "ADMIN SERV_SUBADMIN", 
+        "ACADEMIC SUBDIREC", "ACADEMIC DIRECTION", "BOARDROOM", "SPORTS COORD", 
+        "STUDENT COUNCIL", "DIVISION OF STUDIES", "BASIC SCIENCE DEPT"};
+    public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", 
+        "GESTION TEC VINC", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
+        "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
+        "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
+        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
+        "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
     // banks keywords
     public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
         "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
@@ -75,6 +76,8 @@ public class MessageAnalyzer {
     public static final String TYPE_LOCATE_ITCM = "LOCATE_ITCM#";
     public static final String TYPE_ENTERTAINMENT = "ENTERTAINMENT#";
     public static final String TYPE_TAG_ENTERTAINMENT = "TYPE_ENTERTAINMENT#";
+    public static final String TYPE_BANKS = "BANKS";
+    public static final String TYPE_TAG_BANKS = "TYPE_BANKS#";
     public static final String TYPE_OFICINAS = "OFICINAS#";
     public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
 
@@ -88,9 +91,12 @@ public class MessageAnalyzer {
     public String[] getAction() {
         String[] action = new String[2];
         String response = "";
-        int locating = isLocating();
+        
+        int locating = isLocating();     
         int entertainment;
         String entertainmentPlaces;
+        int banks;
+        String bankPlaces;
         int oficinas;
         String oficinasPlaces;
 
@@ -105,6 +111,7 @@ public class MessageAnalyzer {
                 action[1] = text.substring(locating);
                 return action;
             }
+            
         } else if ((entertainment = isEntertainment()) != -1) {
             action[0] = TYPE_ENTERTAINMENT;
             action[1] = text.substring(entertainment);
@@ -113,6 +120,16 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAG_ENTERTAINMENT;
             action[1] = entertainmentPlaces;
             return action;
+            
+        } else if ((banks = isBank()) != -1) {
+            action[0] = TYPE_BANKS;
+            action[1] = text.substring(banks);
+            return action;                   
+        } else if (!(bankPlaces = isAboutBanks()).isEmpty()) {
+            action[0] = TYPE_TAG_BANKS;
+            action[1] = bankPlaces;
+            return action;
+            
         } else if((oficinas = isOficinas()) != -1){
             action[0] = TYPE_OFICINAS;
             action[1] = text.substring(oficinas);
@@ -121,6 +138,7 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAG_OFICINAS;
             action[1] = oficinasPlaces;
             return action;
+            
         } else {
             action[0] = NOTHING;
             action[1] = NOTHING;
@@ -147,12 +165,20 @@ public class MessageAnalyzer {
             return -1;   
     }
     
+    private int isBank() {
+        
+        if (text.matches(".*Bancos.*")) 
+            return text.indexOf("Bancos");
+        else 
+            return -1;        
+    }
+    
     private int isOficinas(){
-        if (text.matches(".*Oficinas.*")){
+        
+        if (text.matches(".*Oficinas.*"))
             return text.indexOf("Oficinas");
-        } else {
-            return -1;
-        }
+        else 
+            return -1;        
     }
 
     private String isEntertainmentPlaces() {
@@ -162,13 +188,34 @@ public class MessageAnalyzer {
         for (String tokenText : textSplit) {
 
             for (String _places : ENTERTAINMENT_WORDS) {
-                if (collator.compare(tokenText.trim(), _places.trim()) == 0 || tokenText.trim().equalsIgnoreCase(_places.trim())) {
+                if (collator.compare(tokenText.trim(), _places.trim()) == 0 
+                    || tokenText.trim().equalsIgnoreCase(_places.trim())) 
+                {
                     stringContains.append(tokenText).append(" ");
                 }
             }
-            if (tokenText.equalsIgnoreCase("cercano") || tokenText.equalsIgnoreCase("cercanos")) {
+            if (tokenText.equalsIgnoreCase("cercano") 
+                || tokenText.equalsIgnoreCase("cercanos")) 
+            {
                 stringContains.append("cercano").append(" ");
             }
+        }
+        return stringContains.toString();
+    }
+    
+    private String isAboutBanks() {
+        StringBuilder stringContains = new StringBuilder();
+        String[] textSplit = text.split(" ");
+        
+        for (String tokenText : textSplit) {
+            
+            for (String _banks : BANKS_WORDS) {
+                if (collator.compare(tokenText.trim(), _banks.trim()) == 0
+                    || tokenText.trim().equalsIgnoreCase(_banks.trim()))
+                {
+                    stringContains.append(tokenText).append(" ");
+                }                           
+            }            
         }
         return stringContains.toString();
     }
@@ -176,9 +223,12 @@ public class MessageAnalyzer {
     private String isAboutOficinas(){
         StringBuilder stringContains = new StringBuilder();
         String[] textSplit = text.split(" ");
+        
         for (String tokenText : textSplit) {
             for (String _oficinas : OFICINAS_WORDS) {
-                if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0 || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) {
+                if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0 
+                    || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) 
+                {
                     stringContains.append(tokenText).append(" ");
                 }
             }
@@ -212,8 +262,12 @@ public class MessageAnalyzer {
 
     private ArrayList<String> cleanText(String msg) {
         ArrayList<String> split = new ArrayList<>();
-        String replaceAll = msg.replaceAll("\\?", "").replaceAll("¿", "").
-                replaceAll(",", " ").replaceAll("-", " ").replaceAll("_", " ");
+        String replaceAll = msg
+                .replaceAll("\\?", "")
+                .replaceAll("¿", "")
+                .replaceAll(",", " ")
+                .replaceAll("-", " ")
+                .replaceAll("_", " ");
         String[] split1 = replaceAll.split(" ");
 
         for (String string : split1) {
