@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import officePlaces.PlaceOffices;
 
 /**
  *
@@ -81,6 +82,18 @@ public class ServerManagerThread implements Runnable {
                                 new PlaceEntertainment(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
+                                break;
+                            case MessageAnalyzer.TYPE_OFICINAS:
+                                String text2="Escriba la opción que requiera para buscar:";
+                                for(String s:MessageAnalyzer.MUESTRA_OFICINAS){
+                                    text2+="\n\t·"+s;
+                                }
+                                Message responseMessage2 = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, text2);
+                                chatServer.broadcastInfo(responseMessage2);
+                                break;
+                            case MessageAnalyzer.TYPE_TAG_OFICINAS:
+                                Message responseMessage3 = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, messageAction[1]);
+                                new PlaceOffices(messageAction[1],chatServer.getClients().get(packData.getFrom())).start();
                                 break;
                             case MessageAnalyzer.TYPE_BANKS:
                                 String instructionsMessage = "Estas son las opciones de busqueda: ";
