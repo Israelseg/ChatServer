@@ -11,6 +11,7 @@ import com.example.hp.groupchat.shared.ServerUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import entertainmentPlaces.PlaceEntertainment;
+import entertainmentPlaces.PlaceBank;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -43,6 +44,7 @@ public class ServerManagerThread implements Runnable {
         while (true) {
             try {
                 packData = chatServer.getMessageStack().take();
+                
                 switch (packData.getType()) {
                     case KeyWordSystem.TYPE_IMG:
                         new Thread(new saveFileRunnable(packData)).start();
@@ -55,24 +57,55 @@ public class ServerManagerThread implements Runnable {
 
                             case MessageAnalyzer.TYPE_LOCATE:
                             case MessageAnalyzer.TYPE_LOCATE_ITCM:
-                                Message msgMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, messageAction[1]);
+                                Message msgMessage = new Message(
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_QUERY_RESULT, 
+                                        messageAction[1]);
+                                
                                 chatServer.broadcastInfo(msgMessage);
                                 break;
                             case MessageAnalyzer.TYPE_ENTERTAINMENT:
                                 String text="Escriba la opción que requiera para buscar:";
-                                for(String s:MessageAnalyzer.OPTIONS_ENTERTAINMENT){
+                                
+                                for(String s:MessageAnalyzer.OPTIONS_ENTERTAINMENT)
                                     text+="\n\t·"+s;
-                                }
-                                Message responseMessage = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, text);
+                                
+                                Message responseMessage = new Message(
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
+                                        text);          
                                 
                                 chatServer.broadcastInfo(responseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
-                                new PlaceEntertainment(messageAction[1],chatServer.getClients().get(packData.getFrom())).start();
+                                new PlaceEntertainment(
+                                        messageAction[1],
+                                        chatServer.getClients().get(packData.getFrom())).start();
+                                break;
+                            case MessageAnalyzer.TYPE_BANKS:
+                                String instructionsMessage = "Estas son las opciones de busqueda: ";
+                                
+                                for (String bankOption : MessageAnalyzer.BANKS_OPTIONS) 
+                                    instructionsMessage += "\n\t·" + bankOption;
+                                
+                                Message banksResponseMessage = new Message(
+                                        KeyWordSystem.BOT_NAME, 
+                                        KeyWordSystem.TYPE_TEXT, 
+                                        instructionsMessage);
+                                
+                                chatServer.broadcastInfo(banksResponseMessage);
+                                break;
+                            case MessageAnalyzer.TYPE_TAG_BANKS:
+                                new PlaceBank(
+                                        messageAction[1], 
+                                        chatServer.getClients().get(packData.getFrom())).start();
                                 break;
                             case MessageAnalyzer.NOTHING:
                             default:
-                                Message responseServer = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_QUERY_RESULT, "Lo siento, no puedo procesar tu consulta");
+                                Message responseServer = new Message(
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_QUERY_RESULT,
+                                        "Lo siento, no puedo procesar tu consulta");
                                 chatServer.broadcastInfo(responseServer);
                                 break;
                         }
@@ -84,7 +117,6 @@ public class ServerManagerThread implements Runnable {
                     default:
                         System.out.println(packData);
                 }
-
                 pds.add(packData);
             } catch (InterruptedException ex) {
                 System.out.println(chatServer.getCurrentDate() + " Error save data " + ex.getMessage());

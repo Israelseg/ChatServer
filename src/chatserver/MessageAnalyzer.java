@@ -44,8 +44,14 @@ public class MessageAnalyzer {
         "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST"};
     public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
         "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
-        "SPA", "ZOOLOGICO", "PDI"};
-    //office keywords
+        "SPA", "ZOOLOGICO", "PDI"};  
+    // bank keywords
+    public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
+        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
+        "BANJERCITO ", "BANORTE "};
+    public static final String BANKS_OPTIONS[] = {"BANAMEX", "BANCOMER", "HSBC",
+        "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", "TODOS"};
+      //office keywords
     public static final String OFICINAS_WORDS[] = {"COMPUTINGCENTER", "TEC MANAG",
         "RR HH", "STUNDENT SERVICES", "SCHOOL SERVICES", "PLANNING",
         "COMUNICATION Y DIFFUSION", "FINANCIAL RESOURCES", "ADMIN SERV_SUBADMIN", 
@@ -57,11 +63,6 @@ public class MessageAnalyzer {
         "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
         "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
         "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
-    // banks keywords
-    public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
-        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
-        "BANJERCITO ", "BANORTE "};
-    public static final String BANKS_SHOW_OPEN_OPTION[] = {"ABIERTOS"};
     
     public static final String NOTHING = "Nothing to do";
 
@@ -323,7 +324,7 @@ public class MessageAnalyzer {
                         builder.append(ENTERTAINMENT_WORDS[i]).append(" ");
                         almostOne = true;
                     }
-                }
+                }                                
                 
                 for (int i = 0; i < OPTIONS_OFICINAS.length; i++) {
                     

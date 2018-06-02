@@ -45,5 +45,4 @@ public class PlaceEntertainment extends Thread {
             Logger.getLogger(PlaceEntertainment.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
 }
