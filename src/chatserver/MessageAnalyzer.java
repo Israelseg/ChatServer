@@ -52,13 +52,14 @@ public class MessageAnalyzer {
     public static final String BANKS_OPTIONS[] = {"BANAMEX", "BANCOMER", "HSBC",
         "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", "TODOS"};
       //office keywords
-    public static final String OFICINAS_WORDS[] = {"COMPUTINGCENTER", "TEC MANAG",
-        "RR HH", "STUNDENT SERVICES", "SCHOOL SERVICES", "PLANNING",
-        "COMUNICATION Y DIFFUSION", "FINANCIAL RESOURCES", "ADMIN SERV_SUBADMIN", 
-        "ACADEMIC SUBDIREC", "ACADEMIC DIRECTION", "BOARDROOM", "SPORTS COORD", 
-        "STUDENT COUNCIL", "DIVISION OF STUDIES", "BASIC SCIENCE DEPT"};
+    public static final String MUESTRA_OFICINAS[] = {"CENTRO COMPUTO", 
+        "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
+        "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
+        "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
+        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
+        "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
     public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", 
-        "GESTION TEC VINC", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
+        "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
         "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
         "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
         "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
@@ -86,7 +87,7 @@ public class MessageAnalyzer {
         collator = Collator.getInstance();
         collator.setStrength(Collator.NO_DECOMPOSITION);
         ArrayList<String> tokens = cleanText(msg);
-        this.text = replaceWords(tokens);
+        this.text = replaceWords(tokens).replace(" ", "");
     }
 
     public String[] getAction() {
@@ -226,7 +227,7 @@ public class MessageAnalyzer {
         String[] textSplit = text.split(" ");
         
         for (String tokenText : textSplit) {
-            for (String _oficinas : OFICINAS_WORDS) {
+            for (String _oficinas : OPTIONS_OFICINAS) {
                 if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0 
                     || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) 
                 {
@@ -332,7 +333,7 @@ public class MessageAnalyzer {
                     if (collator.compare(token, _oficinas) == 0 
                         || token.trim().equalsIgnoreCase(_oficinas.trim())) 
                     {
-                        builder.append(OFICINAS_WORDS[i]).append(" ");
+                        builder.append(OPTIONS_OFICINAS[i]).append(" ");
                         almostOne = true;
                     }
                 }
@@ -355,7 +356,8 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        MessageAnalyzer messageHandler = new MessageAnalyzer("Centro_computo");
+        String variable = "Consejo estudiantil";
+        MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }
 }
