@@ -8,10 +8,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import routes.Conectar;
 
 public class PlaceOffices extends Thread {
 
@@ -26,43 +31,63 @@ public class PlaceOffices extends Thread {
     @Override
     public void run() {
         try {
-            String oficinas = null;
-            System.out.println(order);
-            if (order.equals("TODASLASOFICINAS ")) {
-                oficinas = "C:\\Users\\Andrés\\Documents\\Andrés\\ITCM\\VIII Semestre\\Topicos Selectos de Supercomputo\\Oficinas.json";
-            } else {
-                double lat = 22.25475, lng = -97.84932;
-                JSONObject geometry, locationes, results, loc;
-                JSONArray resultados = new JSONArray();
-
-                locationes = new JSONObject();
-                loc = new JSONObject();
-                geometry = new JSONObject();
-                results = new JSONObject();
-
-                locationes.put("lat", lat);
-                locationes.put("lng", lng);
-
-                loc.put("location", locationes);
-
-                geometry.put("geometry", loc);
-                geometry.put("name", order);
-
-                resultados.put(0, geometry);
-
+            int indice = 0;
+            double lat = 0.0, lng = 0.0;
+            String oficina = "", descripcion = "", oficinas = "";
+            
+            JSONObject results = new JSONObject();
+            JSONArray resultados = new JSONArray();
+            
+            Conectar objeto = new Conectar();
+            Connection baseDatos = objeto.getConnection();
+            
+            Statement st = baseDatos.createStatement();
+            String sql = "SELECT * FROM oficinas";
+            
+            ResultSet rs = st.executeQuery(sql);
+            
+            if (order.equals("Todaslasoficinas ")) {
+                while (rs.next()) {
+                    
+                    oficina = rs.getString(2);
+                    lat = Double.parseDouble(rs.getString(3));
+                    lng = Double.parseDouble(rs.getString(4));
+                    descripcion = rs.getString(5);
+                        
+                    resultados.put(indice, new JSONObject().put("geometry", new JSONObject().put("location", new JSONObject()
+                    .put("lat", lat).put("lng", lng))).put("name", oficina).put("formatted_address", descripcion));
+                    
+                    indice++;
+                }
                 results.put("results", resultados);
+            } else {
+                while (rs.next()) {
+                    if (rs.getString(2).equals(order)) {
+                        oficina = rs.getString(2);
+                        lat = Double.parseDouble(rs.getString(3));
+                        lng = Double.parseDouble(rs.getString(4));
+                        descripcion = rs.getString(5);
+                    }
+                }
 
-                File archivoTemporal = File.createTempFile("Oficina" + order + user, ".json");
-                archivoTemporal.deleteOnExit();
-                oficinas = archivoTemporal.getAbsolutePath().replace("\\", "/");
-
-                FileWriter fileWriter = new FileWriter(oficinas);
-                BufferedWriter data = new BufferedWriter(fileWriter);
-                data.write(results.toString());
-
-                data.close();
-                fileWriter.close();
+                resultados.put(0, new JSONObject().put("geometry", new JSONObject().put("location", new JSONObject()
+                    .put("lat", lat).put("lng", lng))).put("name", oficina).put("formatted_address", descripcion));
+        
+                results.put("results", resultados);
             }
+            System.out.println(order);
+            System.out.println(results.toString());
+            
+            File archivoTemporal = File.createTempFile("Oficina" + order + user, ".json");
+            archivoTemporal.deleteOnExit();
+            oficinas = archivoTemporal.getAbsolutePath().replace("\\", "/");
+
+            FileWriter fileWriter = new FileWriter(oficinas);
+            BufferedWriter data = new BufferedWriter(fileWriter);
+            data.write(results.toString());
+
+            data.close();
+            fileWriter.close();
 
             System.out.println(oficinas);
 
@@ -80,6 +105,8 @@ public class PlaceOffices extends Thread {
         } catch (FileNotFoundException ex) {
             Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
+            Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

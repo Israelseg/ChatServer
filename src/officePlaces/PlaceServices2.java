@@ -1,6 +1,7 @@
 package officePlaces;
 
-import com.google.gson.Gson;
+import com.example.hp.groupchat.shared.KeyWordSystem;
+import com.example.hp.groupchat.shared.Message;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.BufferedInputStream;
@@ -16,14 +17,19 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.chart.PieChart;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import routes.Conectar;
 
 public class PlaceServices2 {
 
@@ -83,41 +89,79 @@ public class PlaceServices2 {
         return null;
     }
     
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+    public static void main(String[] args) throws FileNotFoundException, IOException, SQLException {
         
-        double lat = 22.25475, lng = -97.84932;
-        JSONObject results;
-        JSONArray resultados = new JSONArray();
+        try{
+        int indice = 0;
+            double lat = 0.0, lng = 0.0;
+            String oficina = "", descripcion = "", oficinas = "", order = "Serviciosescolares", user = "Andrés";
+            
+            JSONObject results = new JSONObject();
+            JSONArray resultados = new JSONArray();
+            
+            Conectar objeto = new Conectar();
+            Connection baseDatos = objeto.getConnection();
+            
+            Statement st = baseDatos.createStatement();
+            String sql = "SELECT * FROM oficinas";
+            
+            ResultSet rs = st.executeQuery(sql);
+            
+            if (order.equals("Todaslasoficinas")) {
+                while (rs.next()) {
+                    
+                    oficina = rs.getString(2);
+                    lat = Double.parseDouble(rs.getString(3));
+                    lng = Double.parseDouble(rs.getString(4));
+                    descripcion = rs.getString(5);
+                        
+                    resultados.put(indice, new JSONObject().put("geometry", new JSONObject().put("location", new JSONObject()
+                    .put("lat", lat).put("lng", lng))).put("name", oficina).put("formatted_address", descripcion));
+                    
+                    indice++;
+                }
+                results.put("results", resultados);
+            } else {
+                while (rs.next()) {
+                    if (rs.getString(2).equals(order)) {
+                        oficina = rs.getString(2);
+                        lat = Double.parseDouble(rs.getString(3));
+                        lng = Double.parseDouble(rs.getString(4));
+                        descripcion = rs.getString(5);
+                    }
+                }
 
-        results = new JSONObject();
+                resultados.put(0, new JSONObject().put("geometry", new JSONObject().put("location", new JSONObject()
+                    .put("lat", lat).put("lng", lng))).put("name", oficina).put("formatted_address", descripcion));
+        
+                results.put("results", resultados);
+            }
+            
+            System.out.println(results.toString());
+            
+            File archivoTemporal = File.createTempFile("Oficina" + order + user, ".json");
+            archivoTemporal.deleteOnExit();
+            oficinas = archivoTemporal.getAbsolutePath().replace("\\", "/");
 
-        for (int i = 0; i < 3; i++) {
-            resultados.put(i, new JSONObject().put("geometry", new JSONObject().put("location", new JSONObject().put("lat", lat).put("lng", lng))).put("name", "Centro computo"));
+            FileWriter fileWriter = new FileWriter(oficinas);
+            BufferedWriter data = new BufferedWriter(fileWriter);
+            data.write(results.toString());
+
+            data.close();
+            fileWriter.close();
+
+            System.out.println(oficinas);
+
+            JSONArray searchByType = PlaceServices2.searchOffice(oficinas);
+            Message response;
+            //System.out.println(response.toString());
+            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, "Se han encontrado " + searchByType.length() + " lugare(s).");
+            response.setJsonString(searchByType.toString());
+            response.setContent(PlaceServices2.staticMap(oficinas));
+        } catch (IOException ex) {
+            Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        results.put("results", resultados);
-        
-        System.out.println(results.toString());
-        
-        File archivoTemporal = File.createTempFile("Oficina" + "Centrocomputo", ".json");
-        archivoTemporal.deleteOnExit();
-        String path = archivoTemporal.getAbsolutePath().replace("\\", "/");
-        
-        System.out.println(path);
-
-        FileWriter fileWriter = new FileWriter(path);
-        BufferedWriter data = new BufferedWriter(fileWriter);
-        data.write(results.toString());
-        
-        data.close();
-        fileWriter.close();
-        
-        //PieChart.Data data = new Gson().fromJson(json, PieChart.Data.class);
-        JSONArray searchByType = PlaceServices2.searchOffice(path);
-        JSONObject jsonObject = searchByType.getJSONObject(0);
-        System.out.println(jsonObject.getString("name"));
-        JSONObject location = jsonObject.getJSONObject("geometry").getJSONObject("location");
-        System.out.println(location.getDouble("lat"));
-        System.out.println(location.getDouble("lng"));
     }
 }
