@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import officePlaces.PlaceOffices;
+import routes.GettingRoutes;
 
 /**
  *
@@ -143,7 +144,9 @@ public class ServerManagerThread implements Runnable {
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
-                                
+                            case MessageAnalyzer.TYPE_ROUTES:
+                                new GettingRoutes(chatServer.getClients().get(packData.getFrom())).start();
+                                break;
                             case MessageAnalyzer.NOTHING:
                                 
                             default:

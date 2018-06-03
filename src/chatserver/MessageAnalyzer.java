@@ -85,6 +85,7 @@ public class MessageAnalyzer {
     public static final String TYPE_TAG_ATM = "TYPE_ATM#";
     public static final String TYPE_OFICINAS = "OFICINAS#";
     public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
+    public static final String TYPE_ROUTES = "TYPE_ROUTES#";
 
     public MessageAnalyzer(String msg) {
         collator = Collator.getInstance();
@@ -154,7 +155,9 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAG_OFICINAS;
             action[1] = oficinasPlaces;
             return action;
-            
+        } else if (isRoutes()) {
+            action[0] = TYPE_ROUTES;
+            return action;
         } else {
             action[0] = NOTHING;
             action[1] = NOTHING;
@@ -203,6 +206,20 @@ public class MessageAnalyzer {
             return text.indexOf("Oficinas");
         else 
             return -1;        
+    }
+    
+    private boolean isRoutes() {
+        if (text.matches(".*ruta.*")) {
+            return true;
+        } else if (text.matches(".*Ruta.*")) {
+            return true;
+        } else if (text.matches(".*rutas.*")) {
+            return true;
+        } else if (text.matches(".*Rutas.*")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private String isEntertainmentPlaces() {
@@ -396,7 +413,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        String variable = "Cajero Banamex";
+        String variable = "¿Qué ruta debo tomar para llegar al tec?";
         MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }
