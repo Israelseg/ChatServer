@@ -64,6 +64,10 @@ public class MessageAnalyzer {
         "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
         "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
     
+    //office related keywords
+    public static final String OPTIONS_TAXI[] = {"REGISTRO","ACTIVAR"};
+    
+    
     public static final String NOTHING = "Nothing to do";
 
     private final Collator collator;
