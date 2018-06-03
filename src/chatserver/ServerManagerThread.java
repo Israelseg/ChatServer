@@ -8,7 +8,7 @@ package chatserver;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
-import google.places.usage.PlacesSearch;
+import google.places.usage.PlacesResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -77,7 +77,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(responseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
-                                new PlacesSearch(
+                                new PlacesResponse(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;            
@@ -96,7 +96,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(banksResponseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_BANKS:
-                                new PlacesSearch(
+                                new PlacesResponse(
                                         messageAction[1], 
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
@@ -115,7 +115,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(atmResponseMessage);
                                 
                             case MessageAnalyzer.TYPE_TAG_ATM:
-                                new PlacesSearch(
+                                new PlacesResponse(
                                         messageAction[1], 
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;    

@@ -3,7 +3,7 @@ package officePlaces;
 import chatserver.ChatServerThread;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
-import google.places.usage.PlacesSearch;
+import google.places.usage.PlacesResponse;
 import google.places.usage.PlaceService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,7 +30,7 @@ public class PlaceOffices extends Thread{
         try {
             user.send(response);
         } catch (Throwable ex) {
-            Logger.getLogger(PlacesSearch.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PlacesResponse.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

@@ -17,12 +17,12 @@ import org.json.JSONObject;
  *
  * @author hp
  */
-public class PlacesSearch extends Thread {
+public class PlacesResponse extends Thread {
 
     private final String order;
     private final ChatServerThread user;
 
-    public PlacesSearch(String order, ChatServerThread userThread) {
+    public PlacesResponse(String order, ChatServerThread userThread) {
         this.order = order;
         this.user = userThread;
     }
@@ -50,7 +50,7 @@ public class PlacesSearch extends Thread {
         try {
             user.send(response);
         } catch (Throwable ex) {
-            Logger.getLogger(PlacesSearch.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(PlacesResponse.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
