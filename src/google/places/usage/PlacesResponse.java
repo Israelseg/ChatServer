@@ -56,8 +56,10 @@ public class PlacesResponse extends Thread {
             for (int i = 0; i < jsonArray.length(); i++) {
                 id = jsonArray.getJSONObject(i).getString("place_id");
                 types = jsonArray.getJSONObject(i).getJSONArray("types");
-                if (order.equals(PlaceService.TYPE_SHOPPING_MALL)) {
-                    if (types.similar(types_mall)) {
+                if (order.toLowerCase().trim().equals(PlaceService.TYPE_SHOPPING_MALL)) {
+                    System.out.println(types.toList());
+                    System.out.println(types_mall.toList());
+                    if (types.toList().contains(types_mall.toList())) {
                         jarray.put(PlaceService.placeDetails(id));
                     }
                 } else {
@@ -73,7 +75,6 @@ public class PlacesResponse extends Thread {
             response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, "No se encontraron lugares cercanos a tu ubicación");
 
         }
-
         try {
             user.send(response);
         } catch (Throwable ex) {
