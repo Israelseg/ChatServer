@@ -45,23 +45,11 @@ public class PlaceBank extends Thread {
                 latitude,
                 longitude,
                 radidus);
-        JSONObject jsonObject;
-        JSONObject location;
-        String name;
-        double lat, lng;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < searchByType.length(); i++) {
-            jsonObject = searchByType.getJSONObject(i);
-            name = jsonObject.getString("name");
-            location = jsonObject.getJSONObject("geometry").getJSONObject("location");
-            lat = location.getDouble("lat");
-            lng = location.getDouble("lng");
-            builder.append(name).append("#").append(lat).append("#").append(lng).append("\n");
-        }
+        
         Message response = new Message(
                 KeyWordSystem.BOT_NAME,
                 KeyWordSystem.TYPE_MAP,
-                builder.toString());
+                searchByType.toString());
         response.setContent(PlaceService.staticMap(latitude, longitude, 14));
 
         try {

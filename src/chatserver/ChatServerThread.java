@@ -39,10 +39,7 @@ public class ChatServerThread extends Thread {
 
     public void send(Message msg) throws Throwable {
         try {
-            // streamOut = new ObjectOutputStream(socket.getOutputStream());
-
             streamOut.writeObject(msg);
-            //  streamOut.flush();
             System.out.println(server.getCurrentDate() + " From " + msg.getFrom() + " to " + userName);
         } catch (IOException ioe) {
             System.out.println(server.getCurrentDate() + " " + userName + " ERROR sending: " + ioe.getMessage());

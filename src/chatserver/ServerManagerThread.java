@@ -63,6 +63,7 @@ public class ServerManagerThread implements Runnable {
                                 
                                 chatServer.broadcastInfo(msgMessage);
                                 break;
+                                
                             case MessageAnalyzer.TYPE_ENTERTAINMENT:
                                 String text="Escriba la opción que requiera para buscar:";
                                 
@@ -80,29 +81,18 @@ public class ServerManagerThread implements Runnable {
                                 new PlaceEntertainment(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
-                                break;
-                            case MessageAnalyzer.TYPE_OFICINAS:
-                                String text2="Escriba la opción que requiera para buscar:";
-                                for(String s:MessageAnalyzer.MUESTRA_OFICINAS){
-                                    text2+="\n\t·"+s;
-                                }
-                                Message responseMessage2 = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, text2);
-                                chatServer.broadcastInfo(responseMessage2);
-                                break;
-                            case MessageAnalyzer.TYPE_TAG_OFICINAS:
-                                Message responseMessage3 = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, messageAction[1]);
-                                new PlaceOffices(messageAction[1],chatServer.getClients().get(packData.getFrom())).start();
-                                break;
+                                break;            
+                                
                             case MessageAnalyzer.TYPE_BANKS:
-                                String instructionsMessage = "Estas son las opciones de busqueda: ";
+                                String bankInstructionsMessage = "Estas son las opciones de busqueda:";
                                 
                                 for (String bankOption : MessageAnalyzer.BANKS_OPTIONS) 
-                                    instructionsMessage += "\n\t·" + bankOption;
+                                    bankInstructionsMessage += "\n\t·" + bankOption;
                                 
                                 Message banksResponseMessage = new Message(
                                         KeyWordSystem.BOT_NAME, 
                                         KeyWordSystem.TYPE_TEXT, 
-                                        instructionsMessage);
+                                        bankInstructionsMessage);
                                 
                                 chatServer.broadcastInfo(banksResponseMessage);
                                 break;
@@ -111,7 +101,52 @@ public class ServerManagerThread implements Runnable {
                                         messageAction[1], 
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
+                                
+                            case MessageAnalyzer.TYPE_ATM:
+                                String atmInstructionsMessage = "Estas son las opciones de busqueda:";
+                                
+                                for (String atmOption : MessageAnalyzer.ATM_OPTIONS) 
+                                    atmInstructionsMessage += "\n\t·" +atmOption;
+                                
+                                Message atmResponseMessage = new Message(
+                                        KeyWordSystem.BOT_NAME, 
+                                        KeyWordSystem.TYPE_TEXT, 
+                                        atmInstructionsMessage);
+                               
+                                chatServer.broadcastInfo(atmResponseMessage);
+                                
+                            case MessageAnalyzer.TYPE_TAG_ATM:
+                                new PlaceBank(
+                                        messageAction[1], 
+                                        chatServer.getClients().get(packData.getFrom())).start();
+                                break;    
+                                
+                            case MessageAnalyzer.TYPE_OFICINAS:
+                                String text2="Escriba la opción que requiera para buscar:";
+                                
+                                for(String s:MessageAnalyzer.OPTIONS_OFICINAS)
+                                    text2+="\n\t·"+s;
+                                
+                                Message responseMessage2 = new Message(
+                                        KeyWordSystem.BOT_NAME, 
+                                        KeyWordSystem.TYPE_TEXT, 
+                                        text2);
+                                
+                                chatServer.broadcastInfo(responseMessage2);
+                                break;
+                            case MessageAnalyzer.TYPE_TAG_OFICINAS:
+                                Message responseMessage3 = new Message(
+                                        KeyWordSystem.BOT_NAME, 
+                                        KeyWordSystem.TYPE_TEXT, 
+                                        messageAction[1]);
+                                //chatServer.broadcastInfo(responseMessage3);
+                                new PlaceOffices(
+                                        messageAction[1],
+                                        chatServer.getClients().get(packData.getFrom())).start();
+                                break;
+                                
                             case MessageAnalyzer.NOTHING:
+                                
                             default:
                                 Message responseServer = new Message(
                                         KeyWordSystem.BOT_NAME,

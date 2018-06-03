@@ -35,29 +35,30 @@ public class MessageAnalyzer {
     private static final String WHY = "Por qué";
     private static final String ESTA = "ESTA";
     
-    // ITCM keywords
+    // ITCM related keywords
     private static final String ITCM[] = {"ITCM", "TEC", "salon", "ISC", "IQ",
         "IGE", "MEC", "PET", "AMB", "TICS", "FF", "EE", "T2"};
-    // entertaiment keywords
+    // entertaiment related keywords
     public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
         "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", 
         "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST"};
     public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
         "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
         "SPA", "ZOOLOGICO", "PDI"};  
-    // bank keywords
-    public static final String BANKS_WORDS[] = {"BANKS ", "ATM ", "BANAMEX ", 
+    // bank related keywords
+    public static final String BANKS_WORDS[] = {"BANKS ", "BANAMEX ", 
+        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
+        "BANJERCITO ", "BANORTE ", "SCOTIABANK "};
+    public static final String BANKS_OPTIONS[] = {"BANAMEX", "BANCOMER", "HSBC",
+        "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", 
+        "SCOTIABANK", "TODOS", "TAMBIEN PUEDO MOSTRARTE CAJEROS AUTOMATICOS"};
+    public static final String ATM_WORDS[] = {"ATM ", "ATMS ", "BANAMEX ", 
         "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
         "BANJERCITO ", "BANORTE "};
-    public static final String BANKS_OPTIONS[] = {"BANAMEX", "BANCOMER", "HSBC",
-        "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", "TODOS"};
-      //office keywords
-    public static final String MUESTRA_OFICINAS[] = {"CENTRO COMPUTO", 
-        "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
-        "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
-        "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
-        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
-        "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
+    public static final String ATM_OPTIONS[] = {"BANAMEX", "BANCOMER", 
+        "HSBC", "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", 
+        "SCOTIABANK", "TODOS", "TAMBIEN PUEDO MOSTRARTE BANCOS"};
+    //office related keywords
     public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", 
         "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
         "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
@@ -78,8 +79,10 @@ public class MessageAnalyzer {
     public static final String TYPE_LOCATE_ITCM = "LOCATE_ITCM#";
     public static final String TYPE_ENTERTAINMENT = "ENTERTAINMENT#";
     public static final String TYPE_TAG_ENTERTAINMENT = "TYPE_ENTERTAINMENT#";
-    public static final String TYPE_BANKS = "BANKS";
+    public static final String TYPE_BANKS = "BANKS#";
     public static final String TYPE_TAG_BANKS = "TYPE_BANKS#";
+    public static final String TYPE_ATM = "ATM#";
+    public static final String TYPE_TAG_ATM = "TYPE_ATM#";
     public static final String TYPE_OFICINAS = "OFICINAS#";
     public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
 
@@ -99,6 +102,8 @@ public class MessageAnalyzer {
         String entertainmentPlaces;
         int banks;
         String bankPlaces;
+        int atms;
+        String atmPlaces;
         int oficinas;
         String oficinasPlaces;
         
@@ -132,6 +137,15 @@ public class MessageAnalyzer {
             action[1] = bankPlaces;
             return action;
             
+        } else if ((atms = isAtm()) != -1) {
+            action[0] = TYPE_ATM;
+            action[1] = text.substring(atms);
+            return action;                   
+        } else if (!(atmPlaces = isAboutAtm()).isEmpty()) {
+            action[0] = TYPE_TAG_ATM;
+            action[1] = atmPlaces;
+            return action;
+            
         } else if((oficinas = isOficinas()) != -1){
             action[0] = TYPE_OFICINAS;
             action[1] = text.substring(oficinas);
@@ -161,8 +175,8 @@ public class MessageAnalyzer {
     
     private int isEntertainment() {
 
-        if (text.matches(".*Lugares de entretenimiento.*")) 
-            return text.indexOf("Lugares");
+        if (text.matches(".*Lugaresdeentretenimiento.*")) 
+            return text.indexOf("Lugaresdeentretenimiento");
         else 
             return -1;   
     }
@@ -171,6 +185,14 @@ public class MessageAnalyzer {
         
         if (text.matches(".*Bancos.*")) 
             return text.indexOf("Bancos");
+        else 
+            return -1;        
+    }
+    
+    private int isAtm() {
+        
+        if (text.matches(".*Cajerosautomaticos.*")) 
+            return text.indexOf("Cajeros");        
         else 
             return -1;        
     }
@@ -215,6 +237,23 @@ public class MessageAnalyzer {
             for (String _banks : BANKS_WORDS) {
                 if (collator.compare(tokenText.trim(), _banks.trim()) == 0
                     || tokenText.trim().equalsIgnoreCase(_banks.trim()))
+                {
+                    stringContains.append(tokenText).append(" ");
+                }                           
+            }            
+        }
+        return stringContains.toString();
+    }
+    
+    private String isAboutAtm() {
+        StringBuilder stringContains = new StringBuilder();
+        String[] textSplit = text.split(" ");
+        
+        for (String tokenText : textSplit) {
+            
+            for (String _atms : ATM_WORDS) {
+                if (collator.compare(tokenText.trim(), _atms.trim()) == 0
+                    || tokenText.trim().equalsIgnoreCase(_atms.trim()))
                 {
                     stringContains.append(tokenText).append(" ");
                 }                           
@@ -357,7 +396,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        String variable = "Consejo estudiantil";
+        String variable = "Lugares de entretenimiento";
         MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }

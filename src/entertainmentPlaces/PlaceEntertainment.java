@@ -38,19 +38,8 @@ public class PlaceEntertainment extends Thread {
         }
         JSONArray jsonArray = PlaceService.searchByType(order.toLowerCase().trim(), lat, lng, radius);
 
-        JSONObject jsonObject;
-        JSONObject location;
-        String name;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < jsonArray.length(); i++) {
-            jsonObject = jsonArray.getJSONObject(i);
-            name = jsonObject.getString("name");
-            location = jsonObject.getJSONObject("geometry").getJSONObject("location");
-            lat = location.getDouble("lat");
-            lng = location.getDouble("lng");
-            builder.append(name).append("#").append(lat).append("#").append(lng).append("\n");
-        }
-        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, builder.toString());
+        
+        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, jsonArray.toString());
         response.setContent(PlaceService.staticMap(lat, lng, 14));
         try {
             user.send(response);
