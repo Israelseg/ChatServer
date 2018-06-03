@@ -62,7 +62,7 @@ public class MessageAnalyzer {
         "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
         "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
         "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
-        "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
+        "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS", "TODAS LAS OFICINAS"};
     
     //office related keywords
     public static final String TAXI_WORDS[] = {"TAXIS"};
@@ -316,7 +316,7 @@ public class MessageAnalyzer {
                 }
             }
         }
-        return stringContains.toString().toUpperCase();
+        return stringContains.toString();
     }
 
     private String isAboutTec() {
@@ -465,7 +465,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        String variable = "¿Qué ruta debo tomar para llegar al tec?";
+        String variable = "Centro computo";
         MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }

@@ -30,7 +30,7 @@ public class ServerManagerThread implements Runnable {
     private ArrayList<Message> pds;
     private Message packData;
     private MessageAnalyzer messageAnalyzer;
-    private final String pathDirectory = "C:\\Users\\Gustavo\\Documents\\NetBeansProjects\\ServerGroupChat\\ChatServer\\src\\imgUsers";
+    private final String pathDirectory = "C:\\Users\\Andrés\\Documents\\NetBeansProjects\\ChatServer\\src\\imgUsers";
 
     public ServerManagerThread(ChatServer chatServer) {
         this.chatServer = chatServer;
