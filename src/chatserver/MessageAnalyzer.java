@@ -175,8 +175,8 @@ public class MessageAnalyzer {
     
     private int isEntertainment() {
 
-        if (text.matches(".*Lugaresdeentretenimiento.*")) 
-            return text.indexOf("Lugaresdeentretenimiento");
+        if (text.matches(".*Lugares de entretenimiento.*")) 
+            return text.indexOf("Lugares de entretenimiento");
         else 
             return -1;   
     }
