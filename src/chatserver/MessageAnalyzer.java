@@ -65,7 +65,8 @@ public class MessageAnalyzer {
         "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS"};
     
     //office related keywords
-    public static final String OPTIONS_TAXI[] = {"REGISTRO","ACTIVAR"};
+    public static final String TAXI_WORDS[] = {"TAXIS"};
+    public static final String OPTIONS_TAXI[] = {"REGISTRAR SERVICIO","INICIAR SERVICIO","SOLICITAR SERVICIO"};
     
     
     public static final String NOTHING = "Nothing to do";
@@ -88,6 +89,8 @@ public class MessageAnalyzer {
     public static final String TYPE_OFICINAS = "OFICINAS#";
     public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
     public static final String TYPE_ROUTES = "TYPE_ROUTES#";
+    public static final String TYPE_TAXI = "TAXI#";
+    public static final String TYPE_TAXI_OPTION = "TYPE_TAXI#";
 
     public MessageAnalyzer(String msg) {
         collator = Collator.getInstance();
@@ -109,6 +112,8 @@ public class MessageAnalyzer {
         String atmPlaces;
         int oficinas;
         String oficinasPlaces;
+        int taxi;
+        String taxiServicios;
         
         if (locating != -1) {
             String aboutTec = isAboutTec();
@@ -160,6 +165,15 @@ public class MessageAnalyzer {
         } else if (isRoutes()) {
             action[0] = TYPE_ROUTES;
             return action;
+        } else if ((taxi = isTaxiService()) != -1) {
+            action[0] = TYPE_TAXI;
+            action[1] = text.substring(taxi);
+            return action;
+        } else if (!(taxiServicios = isTaxiServicios()).isEmpty()) {
+            action[0] = TYPE_TAXI_OPTION;
+            action[1] = taxiServicios;
+            return action;
+          
         } else {
             action[0] = NOTHING;
             action[1] = NOTHING;
@@ -223,6 +237,14 @@ public class MessageAnalyzer {
             return false;
         }
     }
+        private int isTaxiService() {
+        
+        if (text.matches(".*Servicio de taxi.*")) 
+            return text.indexOf("Servicio de taxi");
+        else 
+            return -1;        
+    }
+    
 
     private String isEntertainmentPlaces() {
         StringBuilder stringContains = new StringBuilder();
@@ -311,6 +333,23 @@ public class MessageAnalyzer {
 
         return stringContains.toString();
     }
+    
+     private String isTaxiServicios(){
+        StringBuilder stringContains = new StringBuilder();
+        String[] textSplit = text.replace(" ","").split(" ");
+        
+        for (String tokenText : textSplit) {
+            for (String _servicios : OPTIONS_TAXI) {
+                if (collator.compare(tokenText.trim(), _servicios.trim()) == 0 
+                    || tokenText.trim().equalsIgnoreCase(_servicios.trim())) 
+                {
+                    stringContains.append(tokenText).append(" ");
+                }
+            }
+        }
+        return stringContains.toString().toUpperCase();
+    }
+
 
     private boolean isNumeric(String str) {
         try {
@@ -393,6 +432,17 @@ public class MessageAnalyzer {
                         || token.trim().equalsIgnoreCase(_oficinas.trim())) 
                     {
                         builder.append(OPTIONS_OFICINAS[i]).append(" ");
+                        almostOne = true;
+                    }
+                }
+                
+                for (int i = 0; i < OPTIONS_TAXI.length; i++) {
+                    
+                    String _servicios = OPTIONS_TAXI[i];
+                    if (collator.compare(token, _servicios) == 0 
+                        || token.trim().equalsIgnoreCase(_servicios.trim())) 
+                    {
+                        builder.append(OPTIONS_TAXI[i]).append(" ");
                         almostOne = true;
                     }
                 }
