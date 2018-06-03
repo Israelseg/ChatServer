@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,7 +50,7 @@ public class PlaceService {
         @param radius  Defines the distance (in meters) within which to return place results. 
         @return List of places nearby in format json
      */
-    public static JSONArray searchByType(String type, double lat, double lng, int radius) {
+    public static JSONArray searchByType(String type, double lat, double lng, int radius, boolean all) {
         ArrayList<JSONObject> resultList = new ArrayList<>();
 
         HttpURLConnection conn = null;
@@ -99,7 +100,7 @@ public class PlaceService {
                 }
 
             }
-            while (keySet.contains("next_page_token")) {
+            while (keySet.contains("next_page_token") && all) {
                 String hasNextPage = jsonObj.getString("next_page_token");
                 StringBuilder sb2 = new StringBuilder(PLACES_API_BASE);
 
@@ -154,6 +155,40 @@ public class PlaceService {
         return new JSONArray(resultList);
     }
 
+    public static JSONObject placeDetails(String place_id) {
+        StringBuilder jsonResults = new StringBuilder();
+        HttpURLConnection conn = null;
+        try {
+            StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/details/json");
+            sb.append("?placeid=").append(place_id);
+            sb.append("&key=").append(API_KEY);
+            System.out.println(sb.toString());
+            URL url = new URL(sb.toString());
+            conn = (HttpURLConnection) url.openConnection();
+            InputStreamReader in = new InputStreamReader(conn.getInputStream());
+
+            int read;
+            char[] buff = new char[1024];
+            while ((read = in.read(buff)) != -1) {
+                jsonResults.append(buff, 0, read);
+            }
+            in.close();
+            JSONObject jsonObject = new JSONObject(jsonResults.toString());
+            JSONObject result = jsonObject.getJSONObject("result");
+            return result;
+        } catch (MalformedURLException e) {
+            System.out.println("Error processing Places API URL " + e);
+            return new JSONObject(jsonResults);
+        } catch (IOException e) {
+            System.out.println("Error connecting to Places API " + e);
+            return new JSONObject(jsonResults);
+        } finally {
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+    }
+
     public static byte[] staticMap(double lat, double lng, int zoom) {
         try {
             String base = "https://maps.googleapis.com/maps/api/staticmap?";
@@ -187,20 +222,21 @@ public class PlaceService {
     public static void main(String[] args) {
         double lat = 22.307234, lng = -97.888767;
 
-        JSONArray jsonArray = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000);
-        JSONObject jsonObject;
-        JSONObject location;
-        String name;
-        StringBuilder buider=new StringBuilder();
+        JSONArray jsonArray = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000, false);
+        String id;
+        JSONArray jarray = new JSONArray();
         for (int i = 0; i < jsonArray.length(); i++) {
-            jsonObject = jsonArray.getJSONObject(i);
-            name=jsonObject.getString("name");
-            location = jsonObject.getJSONObject("geometry").getJSONObject("location");
-            lat = location.getDouble("lat");
-            lng = location.getDouble("lng");
-            buider.append(name).append(",").append(lat).append(",").append(lng).append("\n");
+            id = jsonArray.getJSONObject(i).getString("place_id");
+            jarray.put(PlaceService.placeDetails(id));
         }
-        System.out.println(buider.toString());
+        Iterator<String> keys = jarray.getJSONObject(0).keys();
+        while (keys.hasNext()) {
+            String next = keys.next();
+            System.out.println(next);
+        }
+        System.out.println(jarray.getJSONObject(0).getString("formatted_address"));
+        System.out.println(jarray.getJSONObject(0).getString("international_phone_number"));
+        System.out.println(jarray.getJSONObject(0).getDouble("rating"));
 
     }
     /*

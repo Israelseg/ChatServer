@@ -28,25 +28,31 @@ public class PlacesResponse extends Thread {
     }
 
     @Override
-    public void run() {        
+    public void run() {
         double lat = 22.307234, lng = -97.888767;
         int radius = 2000;
         /*
         ITCM coordenates
         double itcmLatitude = 22.256737;
         double itcmLongitude = -97.847265;      
-        */
-        
+         */
+
         if (user.getLocation() != null) {
             String[] split = user.getLocation().split(",");
             lat = Double.parseDouble(split[0]);
             lng = Double.parseDouble(split[1]);
         }
-        
-        JSONArray jsonArray = PlaceService.searchByType(order.toLowerCase().trim(), lat, lng, radius);        
-        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, jsonArray.toString());        
+
+        JSONArray jsonArray = PlaceService.searchByType(order.toLowerCase().trim(), lat, lng, radius, false);
+        JSONArray jarray = new JSONArray();
+        String id;
+        for (int i = 0; i < jsonArray.length(); i++) {
+            id = jsonArray.getJSONObject(i).getString("place_id");
+            jarray.put(PlaceService.placeDetails(id));
+        }
+        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, jarray.toString());
         response.setContent(PlaceService.staticMap(lat, lng, 14));
-        
+
         try {
             user.send(response);
         } catch (Throwable ex) {
