@@ -39,10 +39,10 @@ public class MessageAnalyzer {
     // entertaiment related keywords
     public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
         "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", 
-        "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST"};
+        "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST","SHOPPING_MALL"};
     public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
         "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
-        "SPA", "ZOOLOGICO", "PDI"};  
+        "SPA", "ZOOLOGICO", "PDI","PLAZAS"};  
     // bank related keywords
     public static final String BANKS_WORDS[] = {"BANKS ", "BANAMEX ", 
         "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 

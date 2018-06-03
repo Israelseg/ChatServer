@@ -5,6 +5,7 @@
  */
 package google.places.usage;
 
+import com.example.hp.groupchat.shared.KeyWordSystem;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import org.json.JSONArray;
@@ -221,13 +222,29 @@ public class PlaceService {
 
     public static void main(String[] args) {
         double lat = 22.307234, lng = -97.888767;
-
-        JSONArray jsonArray = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000, false);
+        String order = PlaceService.TYPE_BAR;
+        JSONArray jsonArray = PlaceService.searchByType(order, lat, lng, 10000, false);
         String id;
         JSONArray jarray = new JSONArray();
+        JSONArray types;
+        JSONArray types_mall = new JSONArray();
+        types_mall.put(PlaceService.TYPE_SHOPPING_MALL);
+        types_mall.put(PlaceService.TYPE_POINT_OF_INTEREST);
+        types_mall.put(PlaceService.TYPE_ESTABLISHMENT);
         for (int i = 0; i < jsonArray.length(); i++) {
             id = jsonArray.getJSONObject(i).getString("place_id");
-            jarray.put(PlaceService.placeDetails(id));
+            types = jsonArray.getJSONObject(i).getJSONArray("types");
+            if (order.equals(PlaceService.TYPE_SHOPPING_MALL)) {
+                if (types.similar(types_mall)) {
+                    jarray.put(PlaceService.placeDetails(id));
+                }
+            } else {
+                jarray.put(PlaceService.placeDetails(id));
+            }
+        }
+        for (int i = 0; i < jarray.length(); i++) {
+            JSONObject job = jarray.getJSONObject(i);
+            System.out.println(job.getString("name") + " " + job.getJSONArray("types"));
         }
         Iterator<String> keys = jarray.getJSONObject(0).keys();
         while (keys.hasNext()) {
@@ -251,6 +268,7 @@ public class PlaceService {
     CASINO
     MUSEUM
     MOVIE_THEATER
+    NATURAL_FEATURE
     NIGHT_CLUB
     PARK
     SPA

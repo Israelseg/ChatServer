@@ -48,17 +48,30 @@ public class PlacesResponse extends Thread {
         Message response;
         String id;
         if (jsonArray.length() > 0) {
+            JSONArray types;
+            JSONArray types_mall = new JSONArray();
+            types_mall.put(PlaceService.TYPE_SHOPPING_MALL);
+            types_mall.put(PlaceService.TYPE_POINT_OF_INTEREST);
+            types_mall.put(PlaceService.TYPE_ESTABLISHMENT);
             for (int i = 0; i < jsonArray.length(); i++) {
                 id = jsonArray.getJSONObject(i).getString("place_id");
-                jarray.put(PlaceService.placeDetails(id));
+                types = jsonArray.getJSONObject(i).getJSONArray("types");
+                if (order.equals(PlaceService.TYPE_SHOPPING_MALL)) {
+                    if (types.similar(types_mall)) {
+                        jarray.put(PlaceService.placeDetails(id));
+                    }
+                } else {
+                    jarray.put(PlaceService.placeDetails(id));
+                }
             }
-            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, "Se han encontrado "+jarray.length()+" lugare(s).");
+           
+            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, "Se han encontrado " + jarray.length() + " lugare(s).");
             response.setJsonString(jarray.toString());
             response.setContent(PlaceService.staticMap(lat, lng, 14));
 
-        }else{
-            response=new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT,"No se encontraron lugares cercanos a tu ubicación" );
-            
+        } else {
+            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT, "No se encontraron lugares cercanos a tu ubicación");
+
         }
 
         try {
