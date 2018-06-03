@@ -8,8 +8,7 @@ package chatserver;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
-import entertainmentPlaces.PlaceEntertainment;
-import entertainmentPlaces.PlaceBank;
+import google.places.usage.PlacesSearch;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -78,7 +77,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(responseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
-                                new PlaceEntertainment(
+                                new PlacesSearch(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;            
@@ -97,7 +96,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(banksResponseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_BANKS:
-                                new PlaceBank(
+                                new PlacesSearch(
                                         messageAction[1], 
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
@@ -116,7 +115,7 @@ public class ServerManagerThread implements Runnable {
                                 chatServer.broadcastInfo(atmResponseMessage);
                                 
                             case MessageAnalyzer.TYPE_TAG_ATM:
-                                new PlaceBank(
+                                new PlacesSearch(
                                         messageAction[1], 
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;    

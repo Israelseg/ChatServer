@@ -27,8 +27,8 @@ public class ChatClient extends Applet {
     private TextField input = new TextField();
     private Button send = new Button("Send"), connect = new Button("Connect"),
             quit = new Button("Bye");
-    private String serverName = "0.tcp.ngrok.io";
-    private int serverPort = 11935;
+    private String serverName = "192.168.0.5";
+    private int serverPort = 10001;
     private String user;
     private SocketAddress localSocketAddress;
 

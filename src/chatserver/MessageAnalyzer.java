@@ -191,8 +191,8 @@ public class MessageAnalyzer {
     
     private int isAtm() {
         
-        if (text.matches(".*Cajerosautomaticos.*")) 
-            return text.indexOf("Cajeros");        
+        if (text.matches(".*Cajeros automaticos.*")) 
+            return text.indexOf("Cajeros automaticos");        
         else 
             return -1;        
     }
@@ -396,7 +396,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        String variable = "Lugares de entretenimiento";
+        String variable = "Cajero Banamex";
         MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }
