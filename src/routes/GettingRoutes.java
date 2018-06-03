@@ -124,6 +124,7 @@ public class GettingRoutes extends Thread {
                     String br = auxiliar.get(resultado).getRuta() + "   " + auxiliar.get(resultado).getLatitud() + "," + auxiliar.get(resultado).getLongitud();
                     System.out.println(br);
                     Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_ROUTE, br);
+                    
                     try {
                         user.send(response);
                     } catch (Throwable ex) {

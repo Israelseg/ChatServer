@@ -51,7 +51,7 @@ public class PlaceOffices extends Thread {
                 resultados.put(0, geometry);
 
                 results.put("results", resultados);
-                
+
                 File archivoTemporal = File.createTempFile("Oficina" + order + user, ".json");
                 archivoTemporal.deleteOnExit();
                 oficinas = archivoTemporal.getAbsolutePath().replace("\\", "/");
@@ -63,12 +63,14 @@ public class PlaceOffices extends Thread {
                 data.close();
                 fileWriter.close();
             }
-            
+
             System.out.println(oficinas);
 
             JSONArray searchByType = PlaceServices2.searchOffice(oficinas);
-            Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, searchByType.toString());
+            Message response;
             //System.out.println(response.toString());
+            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, "Se han encontrado " + searchByType.length() + " lugare(s).");
+            response.setJsonString(searchByType.toString());
             response.setContent(PlaceServices2.staticMap(oficinas));
             try {
                 user.send(response);

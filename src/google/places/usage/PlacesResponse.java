@@ -45,13 +45,21 @@ public class PlacesResponse extends Thread {
 
         JSONArray jsonArray = PlaceService.searchByType(order.toLowerCase().trim(), lat, lng, radius, false);
         JSONArray jarray = new JSONArray();
+        Message response;
         String id;
-        for (int i = 0; i < jsonArray.length(); i++) {
-            id = jsonArray.getJSONObject(i).getString("place_id");
-            jarray.put(PlaceService.placeDetails(id));
+        if (jsonArray.length() > 0) {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                id = jsonArray.getJSONObject(i).getString("place_id");
+                jarray.put(PlaceService.placeDetails(id));
+            }
+            response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, "Se han encontrado "+jarray.length()+" lugare(s).");
+            response.setJsonString(jarray.toString());
+            response.setContent(PlaceService.staticMap(lat, lng, 14));
+
+        }else{
+            response=new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_TEXT,"No se encontraron lugares cercanos a tu ubicación" );
+            
         }
-        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, jarray.toString());
-        response.setContent(PlaceService.staticMap(lat, lng, 14));
 
         try {
             user.send(response);
