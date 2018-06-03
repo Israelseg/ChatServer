@@ -3,13 +3,18 @@ package officePlaces;
 import chatserver.ChatServerThread;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
-import google.places.usage.PlacesResponse;
-import google.places.usage.PlaceService;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-public class PlaceOffices extends Thread{
-    
+public class PlaceOffices extends Thread {
+
     private final String order;
     private final ChatServerThread user;
 
@@ -17,21 +22,64 @@ public class PlaceOffices extends Thread{
         this.order = order;
         this.user = userThread;
     }
-    
+
     @Override
     public void run() {
-        double lat = 22.25476, lng = -97.8492;
-        StringBuilder centrocomputo = new StringBuilder();
-            centrocomputo.append(order).append("#").append(lat).append("#").append(lng).append("\n");
-       
-        Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, centrocomputo.toString());
-        System.out.println(response.toString());
-        response.setContent(PlaceService.staticMap(lat, lng, 14));
         try {
-            user.send(response);
-        } catch (Throwable ex) {
-            Logger.getLogger(PlacesResponse.class.getName()).log(Level.SEVERE, null, ex);
+            String oficinas = null;
+            System.out.println(order);
+            if (order.equals("TODASLASOFICINAS ")) {
+                oficinas = "C:\\Users\\Andrés\\Documents\\Andrés\\ITCM\\VIII Semestre\\Topicos Selectos de Supercomputo\\Oficinas.json";
+            } else {
+                double lat = 22.25475, lng = -97.84932;
+                JSONObject geometry, locationes, results, loc;
+                JSONArray resultados = new JSONArray();
+
+                locationes = new JSONObject();
+                loc = new JSONObject();
+                geometry = new JSONObject();
+                results = new JSONObject();
+
+                locationes.put("lat", lat);
+                locationes.put("lng", lng);
+
+                loc.put("location", locationes);
+
+                geometry.put("geometry", loc);
+                geometry.put("name", order);
+
+                resultados.put(0, geometry);
+
+                results.put("results", resultados);
+                
+                File archivoTemporal = File.createTempFile("Oficina" + order + user, ".json");
+                archivoTemporal.deleteOnExit();
+                oficinas = archivoTemporal.getAbsolutePath().replace("\\", "/");
+
+                FileWriter fileWriter = new FileWriter(oficinas);
+                BufferedWriter data = new BufferedWriter(fileWriter);
+                data.write(results.toString());
+
+                data.close();
+                fileWriter.close();
+            }
+            
+            System.out.println(oficinas);
+
+            JSONArray searchByType = PlaceServices2.searchOffice(oficinas);
+            Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, searchByType.toString());
+            //System.out.println(response.toString());
+            response.setContent(PlaceServices2.staticMap(oficinas));
+            try {
+                user.send(response);
+            } catch (Throwable ex) {
+                Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(PlaceOffices.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
 }

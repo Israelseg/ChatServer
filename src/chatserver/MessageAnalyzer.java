@@ -8,8 +8,6 @@ package chatserver;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
 
 /**
  *
@@ -292,7 +290,7 @@ public class MessageAnalyzer {
                 }
             }
         }
-        return stringContains.toString();
+        return stringContains.toString().toUpperCase();
     }
 
     private String isAboutTec() {
