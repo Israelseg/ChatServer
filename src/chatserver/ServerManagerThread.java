@@ -30,7 +30,7 @@ public class ServerManagerThread implements Runnable {
     private ArrayList<Message> pds;
     private Message packData;
     private MessageAnalyzer messageAnalyzer;
-    private final String pathDirectory = "C:\\Users\\Andrés\\Documents\\NetBeansProjects\\ChatServer\\src\\imgUsers";
+    private final String pathDirectory = "C:\\Users\\Gustavo\\Documents\\NetBeansProjects\\ServerGroupChat\\ChatServer\\src\\imgUsers";
 
     public ServerManagerThread(ChatServer chatServer) {
         this.chatServer = chatServer;
@@ -55,6 +55,7 @@ public class ServerManagerThread implements Runnable {
                         switch (messageAction[0]) {
 
                             case MessageAnalyzer.TYPE_LOCATE:
+                            break;
                             case MessageAnalyzer.TYPE_LOCATE_ITCM:
                                 Message msgMessage = new Message(
                                         KeyWordSystem.BOT_NAME,
@@ -114,7 +115,7 @@ public class ServerManagerThread implements Runnable {
                                         atmInstructionsMessage);
                                
                                 chatServer.broadcastInfo(atmResponseMessage);
-                                
+                                break;
                             case MessageAnalyzer.TYPE_TAG_ATM:
                                 new PlacesResponse(
                                         messageAction[1], 
@@ -144,10 +145,26 @@ public class ServerManagerThread implements Runnable {
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
+                                //---------
+                                case MessageAnalyzer.TYPE_TAXI:
+                                String instruccionesST = "Bienvenido al servicio de taxi,eliga una opción:";
+                                
+                                for (String opcionST : MessageAnalyzer.OPTIONS_TAXI) 
+                                    instruccionesST += "\n--> " +opcionST;
+                                
+                                Message respuestaST = new Message(
+                                        KeyWordSystem.BOT_NAME, 
+                                        KeyWordSystem.TYPE_TEXT, 
+                                        instruccionesST);
+                               
+                                chatServer.broadcastInfo(respuestaST);
+                                break;
+                                //---------------
                             case MessageAnalyzer.TYPE_ROUTES:
                                 new GettingRoutes(chatServer.getClients().get(packData.getFrom())).start();
                                 break;
                             case MessageAnalyzer.NOTHING:
+                            break;
                                 
                             default:
                                 Message responseServer = new Message(
