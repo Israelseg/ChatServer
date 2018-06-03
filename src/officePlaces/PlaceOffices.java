@@ -7,7 +7,6 @@ import entertainmentPlaces.PlaceEntertainment;
 import entertainmentPlaces.PlaceService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.json.JSONArray;
 
 public class PlaceOffices extends Thread{
     
@@ -22,10 +21,9 @@ public class PlaceOffices extends Thread{
     @Override
     public void run() {
         double lat = 22.25476, lng = -97.8492;
-        JSONArray centrocomputo = new JSONArray();
-        centrocomputo.put(0, order);
-        centrocomputo.put(1, lat);
-        centrocomputo.put(2, lng);
+        StringBuilder centrocomputo = new StringBuilder();
+            centrocomputo.append(order).append("#").append(lat).append("#").append(lng).append("\n");
+       
         Message response = new Message(KeyWordSystem.BOT_NAME, KeyWordSystem.TYPE_MAP, centrocomputo.toString());
         System.out.println(response.toString());
         response.setContent(PlaceService.staticMap(lat, lng, 14));

@@ -188,12 +188,20 @@ public class PlaceService {
     public static void main(String[] args) {
         double lat = 22.307234, lng = -97.888767;
 
-        JSONArray searchByType = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000);
-        JSONObject jsonObject = searchByType.getJSONObject(0);
-        System.out.println(jsonObject.getString("name"));
-        JSONObject location = jsonObject.getJSONObject("geometry").getJSONObject("location");
-        System.out.println(location.getDouble("lat"));
-        System.out.println(location.getDouble("lng"));
+        JSONArray jsonArray = PlaceService.searchByType(PlaceService.TYPE_BAR, lat, lng, 2000);
+        JSONObject jsonObject;
+        JSONObject location;
+        String name;
+        StringBuilder buider=new StringBuilder();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            jsonObject = jsonArray.getJSONObject(i);
+            name=jsonObject.getString("name");
+            location = jsonObject.getJSONObject("geometry").getJSONObject("location");
+            lat = location.getDouble("lat");
+            lng = location.getDouble("lng");
+            buider.append(name).append(",").append(lat).append(",").append(lng).append("\n");
+        }
+        System.out.println(buider.toString());
 
     }
     /*

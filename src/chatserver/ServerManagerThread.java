@@ -8,8 +8,6 @@ package chatserver;
 import com.example.hp.groupchat.shared.KeyWordSystem;
 import com.example.hp.groupchat.shared.Message;
 import com.example.hp.groupchat.shared.ServerUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import entertainmentPlaces.PlaceEntertainment;
 import entertainmentPlaces.PlaceBank;
 import java.io.File;

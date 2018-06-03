@@ -87,7 +87,7 @@ public class MessageAnalyzer {
         collator = Collator.getInstance();
         collator.setStrength(Collator.NO_DECOMPOSITION);
         ArrayList<String> tokens = cleanText(msg);
-        this.text = replaceWords(tokens).replace(" ", "");
+        this.text = replaceWords(tokens);
     }
 
     public String[] getAction() {
@@ -101,7 +101,7 @@ public class MessageAnalyzer {
         String bankPlaces;
         int oficinas;
         String oficinasPlaces;
-
+        
         if (locating != -1) {
             String aboutTec = isAboutTec();
             if (!aboutTec.isEmpty()) {
@@ -207,6 +207,7 @@ public class MessageAnalyzer {
     
     private String isAboutBanks() {
         StringBuilder stringContains = new StringBuilder();
+        
         String[] textSplit = text.split(" ");
         
         for (String tokenText : textSplit) {
@@ -224,7 +225,7 @@ public class MessageAnalyzer {
     
     private String isAboutOficinas(){
         StringBuilder stringContains = new StringBuilder();
-        String[] textSplit = text.split(" ");
+        String[] textSplit = text.replace(" ","").split(" ");
         
         for (String tokenText : textSplit) {
             for (String _oficinas : OPTIONS_OFICINAS) {
