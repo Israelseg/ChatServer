@@ -32,43 +32,42 @@ public class MessageAnalyzer {
     private static final String WHERE = "Dónde";
     private static final String WHY = "Por qué";
     private static final String ESTA = "ESTA";
-    
+
     // ITCM related keywords
     private static final String ITCM[] = {"ITCM", "TEC", "salon", "ISC", "IQ",
         "IGE", "MEC", "PET", "AMB", "TICS", "FF", "EE", "T2"};
     // entertaiment related keywords
     public static final String ENTERTAINMENT_WORDS[] = {"AQUARIUM ", "ART_GALLERY ",
-        "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ", 
-        "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST","SHOPPING_MALL"};
+        "BAR ", "CAFE ", "CASINO ", "MUSEUM ", "MOVIE_THEATER ", "NIGHTCLUB ",
+        "PARK ", "SPA ", "ZOO ", "POINT_OF_INTEREST", "SHOPPING_MALL"};
     public static final String OPTIONS_ENTERTAINMENT[] = {"ACUARIO", "GALERÍAS",
-        "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE", 
-        "SPA", "ZOOLOGICO", "PDI","PLAZAS"};  
+        "BAR ", "CAFETERÍA", "CASINO", "MUSEO", "CINE", "NightClub", "PARQUE",
+        "SPA", "ZOOLOGICO", "PDI", "PLAZAS"};
     // bank related keywords
-    public static final String BANKS_WORDS[] = {"BANKS ", "BANAMEX ", 
-        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
+    public static final String BANKS_WORDS[] = {"BANKS ", "BANAMEX ",
+        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ",
         "BANJERCITO ", "BANORTE ", "SCOTIABANK "};
     public static final String BANKS_OPTIONS[] = {"BANAMEX", "BANCOMER", "HSBC",
-        "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", 
+        "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE",
         "SCOTIABANK", "TODOS", "TAMBIEN PUEDO MOSTRARTE CAJEROS AUTOMATICOS"};
-    public static final String ATM_WORDS[] = {"ATM ", "ATMS ", "BANAMEX ", 
-        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ", 
+    public static final String ATM_WORDS[] = {"ATM ", "ATMS ", "BANAMEX ",
+        "BANCOMER ", "HSBC ", "BANCO AZTECA ", "SANTANDER ", "BANREGIO ",
         "BANJERCITO ", "BANORTE "};
-    public static final String ATM_OPTIONS[] = {"BANAMEX", "BANCOMER", 
-        "HSBC", "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE", 
+    public static final String ATM_OPTIONS[] = {"BANAMEX", "BANCOMER",
+        "HSBC", "BANCO AZTECA", "SANTANDER", "BANREGIO", "BANJERCITO", "BANORTE",
         "SCOTIABANK", "TODOS", "TAMBIEN PUEDO MOSTRARTE BANCOS"};
     //office related keywords
-    public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO", 
-        "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES", 
-        "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION", 
+    public static final String OPTIONS_OFICINAS[] = {"CENTRO COMPUTO",
+        "VINCULACION", "RECURSOS HUMANOS", "SERVICIOS ESTUDIANTILES",
+        "SERVICIOS ESCOLARES", "PLANEACION", "COMUNICACION Y DIFUSION",
         "RECURSOS FINANCIEROS", "SUBDIRECCION SERV ADM", "SUBDIRECCION ACADEMICA",
-        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL", 
+        "DIRECCION", "SALA JUNTAS", "COORDINACION DEPORTIVA", "CONSEJO ESTUDIANTIL",
         "DIVISION DE ESTUDIOS", "DPTO CIENCIAS BASICAS", "TODAS LAS OFICINAS"};
-    
+
     //office related keywords
     public static final String TAXI_WORDS[] = {"TAXIS"};
-    public static final String OPTIONS_TAXI[] = {"REGISTRAR SERVICIO","INICIAR SERVICIO","SOLICITAR SERVICIO"};
-    
-    
+    public static final String OPTIONS_TAXI[] = {"REGISTRAR SERVICIO", "INICIAR SERVICIO", "SOLICITAR SERVICIO"};
+
     public static final String NOTHING = "Nothing to do";
 
     private final Collator collator;
@@ -88,7 +87,7 @@ public class MessageAnalyzer {
     public static final String TYPE_TAG_ATM = "TYPE_ATM#";
     public static final String TYPE_OFICINAS = "OFICINAS#";
     public static final String TYPE_TAG_OFICINAS = "TYPE_OFICINAS#";
-    public static final String TYPE_ROUTES = "TYPE_ROUTES#";
+    public static final String TYPE_RUTA = "TYPE_RUTA#";
     public static final String TYPE_TAXI = "TAXI#";
     public static final String TYPE_TAXI_OPTION = "TYPE_TAXI#";
 
@@ -102,8 +101,8 @@ public class MessageAnalyzer {
     public String[] getAction() {
         String[] action = new String[2];
         String response = "";
-        
-        int locating = isLocating();     
+
+        int locating = isLocating();
         int entertainment;
         String entertainmentPlaces;
         int banks;
@@ -114,7 +113,7 @@ public class MessageAnalyzer {
         String oficinasPlaces;
         int taxi;
         String taxiServicios;
-        
+
         if (locating != -1) {
             String aboutTec = isAboutTec();
             if (!aboutTec.isEmpty()) {
@@ -126,7 +125,7 @@ public class MessageAnalyzer {
                 action[1] = text.substring(locating);
                 return action;
             }
-            
+
         } else if ((entertainment = isEntertainment()) != -1) {
             action[0] = TYPE_ENTERTAINMENT;
             action[1] = text.substring(entertainment);
@@ -135,26 +134,26 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAG_ENTERTAINMENT;
             action[1] = entertainmentPlaces;
             return action;
-            
+
         } else if ((banks = isBank()) != -1) {
             action[0] = TYPE_BANKS;
             action[1] = text.substring(banks);
-            return action;                   
+            return action;
         } else if (!(bankPlaces = isAboutBanks()).isEmpty()) {
             action[0] = TYPE_TAG_BANKS;
             action[1] = bankPlaces;
             return action;
-            
+
         } else if ((atms = isAtm()) != -1) {
             action[0] = TYPE_ATM;
             action[1] = text.substring(atms);
-            return action;                   
+            return action;
         } else if (!(atmPlaces = isAboutAtm()).isEmpty()) {
             action[0] = TYPE_TAG_ATM;
             action[1] = atmPlaces;
             return action;
-            
-        } else if((oficinas = isOficinas()) != -1){
+
+        } else if ((oficinas = isOficinas()) != -1) {
             action[0] = TYPE_OFICINAS;
             action[1] = text.substring(oficinas);
             return action;
@@ -162,8 +161,8 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAG_OFICINAS;
             action[1] = oficinasPlaces;
             return action;
-        } else if (isRoutes()) {
-            action[0] = TYPE_ROUTES;
+        } else if (esRuta()) {
+            action[0] = TYPE_RUTA;
             return action;
         } else if ((taxi = isTaxiService()) != -1) {
             action[0] = TYPE_TAXI;
@@ -173,7 +172,7 @@ public class MessageAnalyzer {
             action[0] = TYPE_TAXI_OPTION;
             action[1] = taxiServicios;
             return action;
-          
+
         } else {
             action[0] = NOTHING;
             action[1] = NOTHING;
@@ -191,60 +190,55 @@ public class MessageAnalyzer {
             return -1;
         }
     }
-    
+
     private int isEntertainment() {
 
-        if (text.matches(".*Lugares de entretenimiento.*")) 
+        if (text.matches(".*Lugares de entretenimiento.*")) {
             return text.indexOf("Lugares de entretenimiento");
-        else 
-            return -1;   
-    }
-    
-    private int isBank() {
-        
-        if (text.matches(".*Bancos.*")) 
-            return text.indexOf("Bancos");
-        else 
-            return -1;        
-    }
-    
-    private int isAtm() {
-        
-        if (text.matches(".*Cajeros automaticos.*")) 
-            return text.indexOf("Cajeros automaticos");        
-        else 
-            return -1;        
-    }
-    
-    private int isOficinas(){
-        
-        if (text.matches(".*Oficinas.*"))
-            return text.indexOf("Oficinas");
-        else 
-            return -1;        
-    }
-    
-    private boolean isRoutes() {
-        if (text.matches(".*ruta.*")) {
-            return true;
-        } else if (text.matches(".*Ruta.*")) {
-            return true;
-        } else if (text.matches(".*rutas.*")) {
-            return true;
-        } else if (text.matches(".*Rutas.*")) {
-            return true;
         } else {
-            return false;
+            return -1;
         }
     }
-        private int isTaxiService() {
-        
-        if (text.matches(".*Servicio de taxi.*")) 
-            return text.indexOf("Servicio de taxi");
-        else 
-            return -1;        
+
+    private int isBank() {
+
+        if (text.matches(".*Bancos.*")) {
+            return text.indexOf("Bancos");
+        } else {
+            return -1;
+        }
     }
-    
+
+    private int isAtm() {
+
+        if (text.matches(".*Cajeros automaticos.*")) {
+            return text.indexOf("Cajeros automaticos");
+        } else {
+            return -1;
+        }
+    }
+
+    private int isOficinas() {
+
+        if (text.matches(".*Oficinas.*")) {
+            return text.indexOf("Oficinas");
+        } else {
+            return -1;
+        }
+    }
+
+    private boolean esRuta() {
+        return text.matches(".*ruta.*");
+    }
+
+    private int isTaxiService() {
+
+        if (text.matches(".*Servicio de taxi.*")) {
+            return text.indexOf("Servicio de taxi");
+        } else {
+            return -1;
+        }
+    }
 
     private String isEntertainmentPlaces() {
         StringBuilder stringContains = new StringBuilder();
@@ -253,65 +247,60 @@ public class MessageAnalyzer {
         for (String tokenText : textSplit) {
 
             for (String _places : ENTERTAINMENT_WORDS) {
-                if (collator.compare(tokenText.trim(), _places.trim()) == 0 
-                    || tokenText.trim().equalsIgnoreCase(_places.trim())) 
-                {
+                if (collator.compare(tokenText.trim(), _places.trim()) == 0
+                        || tokenText.trim().equalsIgnoreCase(_places.trim())) {
                     stringContains.append(tokenText).append(" ");
                 }
             }
-            if (tokenText.equalsIgnoreCase("cercano") 
-                || tokenText.equalsIgnoreCase("cercanos")) 
-            {
+            if (tokenText.equalsIgnoreCase("cercano")
+                    || tokenText.equalsIgnoreCase("cercanos")) {
                 stringContains.append("cercano").append(" ");
             }
         }
         return stringContains.toString();
     }
-    
+
     private String isAboutBanks() {
         StringBuilder stringContains = new StringBuilder();
-        
+
         String[] textSplit = text.split(" ");
-        
+
         for (String tokenText : textSplit) {
-            
+
             for (String _banks : BANKS_WORDS) {
                 if (collator.compare(tokenText.trim(), _banks.trim()) == 0
-                    || tokenText.trim().equalsIgnoreCase(_banks.trim()))
-                {
+                        || tokenText.trim().equalsIgnoreCase(_banks.trim())) {
                     stringContains.append(tokenText).append(" ");
-                }                           
-            }            
+                }
+            }
         }
         return stringContains.toString();
     }
-    
+
     private String isAboutAtm() {
         StringBuilder stringContains = new StringBuilder();
         String[] textSplit = text.split(" ");
-        
+
         for (String tokenText : textSplit) {
-            
+
             for (String _atms : ATM_WORDS) {
                 if (collator.compare(tokenText.trim(), _atms.trim()) == 0
-                    || tokenText.trim().equalsIgnoreCase(_atms.trim()))
-                {
+                        || tokenText.trim().equalsIgnoreCase(_atms.trim())) {
                     stringContains.append(tokenText).append(" ");
-                }                           
-            }            
+                }
+            }
         }
         return stringContains.toString();
     }
-    
-    private String isAboutOficinas(){
+
+    private String isAboutOficinas() {
         StringBuilder stringContains = new StringBuilder();
-        String[] textSplit = text.replace(" ","").split(" ");
-        
+        String[] textSplit = text.replace(" ", "").split(" ");
+
         for (String tokenText : textSplit) {
             for (String _oficinas : OPTIONS_OFICINAS) {
-                if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0 
-                    || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) 
-                {
+                if (collator.compare(tokenText.trim(), _oficinas.trim()) == 0
+                        || tokenText.trim().equalsIgnoreCase(_oficinas.trim())) {
                     stringContains.append(tokenText).append(" ");
                 }
             }
@@ -322,7 +311,7 @@ public class MessageAnalyzer {
     private String isAboutTec() {
         StringBuilder stringContains = new StringBuilder();
         String[] textSplit = text.split(" ");
-        
+
         for (String tokenText : textSplit) {
             for (String _itcm : ITCM) {
                 if (tokenText.contains(_itcm)) {
@@ -333,23 +322,21 @@ public class MessageAnalyzer {
 
         return stringContains.toString();
     }
-    
-     private String isTaxiServicios(){
+
+    private String isTaxiServicios() {
         StringBuilder stringContains = new StringBuilder();
-        String[] textSplit = text.replace(" ","").split(" ");
-        
+        String[] textSplit = text.replace(" ", "").split(" ");
+
         for (String tokenText : textSplit) {
             for (String _servicios : OPTIONS_TAXI) {
-                if (collator.compare(tokenText.trim(), _servicios.trim()) == 0 
-                    || tokenText.trim().equalsIgnoreCase(_servicios.trim())) 
-                {
+                if (collator.compare(tokenText.trim(), _servicios.trim()) == 0
+                        || tokenText.trim().equalsIgnoreCase(_servicios.trim())) {
                     stringContains.append(tokenText).append(" ");
                 }
             }
         }
         return stringContains.toString().toUpperCase();
     }
-
 
     private boolean isNumeric(String str) {
         try {
@@ -406,47 +393,44 @@ public class MessageAnalyzer {
                 builder.append(ESTA).append(" ");
             } else {
                 boolean almostOne = false;
-                
+
                 for (String _itcm : ITCM) {
                     if (collator.compare(token, _itcm) == 0) {
                         builder.append(_itcm).append(" ");
                         almostOne = true;
                     }
                 }
-                
+
                 for (int i = 0; i < OPTIONS_ENTERTAINMENT.length; i++) {
-                    
+
                     String _places = OPTIONS_ENTERTAINMENT[i];
-                    if (collator.compare(token, _places) == 0 
-                        || token.trim().equalsIgnoreCase(_places.trim())) 
-                    {
+                    if (collator.compare(token, _places) == 0
+                            || token.trim().equalsIgnoreCase(_places.trim())) {
                         builder.append(ENTERTAINMENT_WORDS[i]).append(" ");
                         almostOne = true;
                     }
-                }                                
-                
+                }
+
                 for (int i = 0; i < OPTIONS_OFICINAS.length; i++) {
-                    
+
                     String _oficinas = OPTIONS_OFICINAS[i];
-                    if (collator.compare(token, _oficinas) == 0 
-                        || token.trim().equalsIgnoreCase(_oficinas.trim())) 
-                    {
+                    if (collator.compare(token, _oficinas) == 0
+                            || token.trim().equalsIgnoreCase(_oficinas.trim())) {
                         builder.append(OPTIONS_OFICINAS[i]).append(" ");
                         almostOne = true;
                     }
                 }
-                
+
                 for (int i = 0; i < OPTIONS_TAXI.length; i++) {
-                    
+
                     String _servicios = OPTIONS_TAXI[i];
-                    if (collator.compare(token, _servicios) == 0 
-                        || token.trim().equalsIgnoreCase(_servicios.trim())) 
-                    {
+                    if (collator.compare(token, _servicios) == 0
+                            || token.trim().equalsIgnoreCase(_servicios.trim())) {
                         builder.append(OPTIONS_TAXI[i]).append(" ");
                         almostOne = true;
                     }
                 }
-                
+
                 if (!almostOne) {
                     builder.append(token).append(" ");
                 }
@@ -465,7 +449,7 @@ public class MessageAnalyzer {
     }
 
     public static void main(String[] args) {
-        String variable = "Centro computo";
+        String variable = "¿Cuál es la ruta más cercana al tec?";
         MessageAnalyzer messageHandler = new MessageAnalyzer(variable);
         System.out.println(Arrays.toString(messageHandler.getAction()));
     }

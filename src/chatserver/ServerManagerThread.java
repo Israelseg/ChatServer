@@ -43,7 +43,7 @@ public class ServerManagerThread implements Runnable {
         while (true) {
             try {
                 packData = chatServer.getMessageStack().take();
-                
+
                 switch (packData.getType()) {
                     case KeyWordSystem.TYPE_IMG:
                         new Thread(new saveFileRunnable(packData)).start();
@@ -55,117 +55,122 @@ public class ServerManagerThread implements Runnable {
                         switch (messageAction[0]) {
 
                             case MessageAnalyzer.TYPE_LOCATE:
-                            break;
+                                break;
                             case MessageAnalyzer.TYPE_LOCATE_ITCM:
                                 Message msgMessage = new Message(
                                         KeyWordSystem.BOT_NAME,
-                                        KeyWordSystem.TYPE_QUERY_RESULT, 
+                                        KeyWordSystem.TYPE_QUERY_RESULT,
                                         messageAction[1]);
-                                
+
                                 chatServer.broadcastInfo(msgMessage);
                                 break;
-                                
+
                             case MessageAnalyzer.TYPE_ENTERTAINMENT:
-                                String text="Escriba la opción que requiera para buscar:";
-                                
-                                for(String s:MessageAnalyzer.OPTIONS_ENTERTAINMENT)
-                                    text+="\n\t·"+s;
-                                
+                                String text = "Escriba la opción que requiera para buscar:";
+
+                                for (String s : MessageAnalyzer.OPTIONS_ENTERTAINMENT) {
+                                    text += "\n\t·" + s;
+                                }
+
                                 Message responseMessage = new Message(
                                         KeyWordSystem.BOT_NAME,
                                         KeyWordSystem.TYPE_TEXT,
-                                        text);          
-                                
+                                        text);
+
                                 chatServer.broadcastInfo(responseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ENTERTAINMENT:
                                 new PlacesResponse(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
-                                break;            
-                                
+                                break;
+
                             case MessageAnalyzer.TYPE_BANKS:
                                 String bankInstructionsMessage = "Estas son las opciones de busqueda:";
-                                
-                                for (String bankOption : MessageAnalyzer.BANKS_OPTIONS) 
+
+                                for (String bankOption : MessageAnalyzer.BANKS_OPTIONS) {
                                     bankInstructionsMessage += "\n\t·" + bankOption;
-                                
+                                }
+
                                 Message banksResponseMessage = new Message(
-                                        KeyWordSystem.BOT_NAME, 
-                                        KeyWordSystem.TYPE_TEXT, 
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
                                         bankInstructionsMessage);
-                                
+
                                 chatServer.broadcastInfo(banksResponseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_BANKS:
                                 new PlacesResponse(
-                                        messageAction[1], 
+                                        messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
-                                
+
                             case MessageAnalyzer.TYPE_ATM:
                                 String atmInstructionsMessage = "Estas son las opciones de busqueda:";
-                                
-                                for (String atmOption : MessageAnalyzer.ATM_OPTIONS) 
-                                    atmInstructionsMessage += "\n\t·" +atmOption;
-                                
+
+                                for (String atmOption : MessageAnalyzer.ATM_OPTIONS) {
+                                    atmInstructionsMessage += "\n\t·" + atmOption;
+                                }
+
                                 Message atmResponseMessage = new Message(
-                                        KeyWordSystem.BOT_NAME, 
-                                        KeyWordSystem.TYPE_TEXT, 
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
                                         atmInstructionsMessage);
-                               
+
                                 chatServer.broadcastInfo(atmResponseMessage);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_ATM:
                                 new PlacesResponse(
-                                        messageAction[1], 
+                                        messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
-                                break;    
-                                
+                                break;
+
                             case MessageAnalyzer.TYPE_OFICINAS:
-                                String text2="Escriba la opción que requiera para buscar:";
-                                
-                                for(String s:MessageAnalyzer.OPTIONS_OFICINAS)
-                                    text2+="\n\t·"+s;
-                                
+                                String text2 = "Escriba la opción que requiera para buscar:";
+
+                                for (String s : MessageAnalyzer.OPTIONS_OFICINAS) {
+                                    text2 += "\n\t·" + s;
+                                }
+
                                 Message responseMessage2 = new Message(
-                                        KeyWordSystem.BOT_NAME, 
-                                        KeyWordSystem.TYPE_TEXT, 
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
                                         text2);
-                                
+
                                 chatServer.broadcastInfo(responseMessage2);
                                 break;
                             case MessageAnalyzer.TYPE_TAG_OFICINAS:
                                 Message responseMessage3 = new Message(
-                                        KeyWordSystem.BOT_NAME, 
-                                        KeyWordSystem.TYPE_TEXT, 
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
                                         messageAction[1]);
                                 //chatServer.broadcastInfo(responseMessage3);
                                 new PlaceOffices(
                                         messageAction[1],
                                         chatServer.getClients().get(packData.getFrom())).start();
                                 break;
-                                //---------
-                                case MessageAnalyzer.TYPE_TAXI:
+                            //---------
+                            case MessageAnalyzer.TYPE_TAXI:
                                 String instruccionesST = "Bienvenido al servicio de taxi,eliga una opción:";
-                                
-                                for (String opcionST : MessageAnalyzer.OPTIONS_TAXI) 
-                                    instruccionesST += "\n--> " +opcionST;
-                                
+
+                                for (String opcionST : MessageAnalyzer.OPTIONS_TAXI) {
+                                    instruccionesST += "\n--> " + opcionST;
+                                }
+
                                 Message respuestaST = new Message(
-                                        KeyWordSystem.BOT_NAME, 
-                                        KeyWordSystem.TYPE_TEXT, 
+                                        KeyWordSystem.BOT_NAME,
+                                        KeyWordSystem.TYPE_TEXT,
                                         instruccionesST);
-                               
+
                                 chatServer.broadcastInfo(respuestaST);
                                 break;
-                                //---------------
-                            case MessageAnalyzer.TYPE_ROUTES:
+                            //---------------
+                            case MessageAnalyzer.TYPE_RUTA:
                                 new GettingRoutes(chatServer.getClients().get(packData.getFrom())).start();
                                 break;
                             case MessageAnalyzer.NOTHING:
-                            break;
-                                
+                                break;
+
                             default:
                                 Message responseServer = new Message(
                                         KeyWordSystem.BOT_NAME,

@@ -14,13 +14,13 @@ public class Auxiliar {
     private final String ruta;
     private final String latitud;
     private final String longitud;
-    private final double distancia;
+    private final double distanciaTotal;
 
-    public Auxiliar(String ruta, String array[], Double distancia) {
+    public Auxiliar(String ruta, String arreglo[], Double distanciaTotal) {
         this.ruta = ruta;
-        this.latitud = array[1];
-        this.longitud = array[2];
-        this.distancia = distancia;
+        this.latitud = arreglo[1];
+        this.longitud = arreglo[2];
+        this.distanciaTotal = distanciaTotal;
     }
 
     public String getRuta() {
@@ -35,8 +35,8 @@ public class Auxiliar {
         return this.longitud;
     }
 
-    public double getDistancia() {
-        return this.distancia;
+    public double getDistanciaTotal() {
+        return this.distanciaTotal;
     }
 
 }

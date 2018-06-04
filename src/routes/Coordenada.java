@@ -19,13 +19,12 @@ public class Coordenada {
         this.longitud = longitud;
     }
 
-    public double calcularDistancia(Coordenada parametros) {
-        double A = this.latitud - parametros.getLatitud();
-        double B = this.longitud - parametros.getLongitud();
-        double A2 = Math.pow(A, 2);
-        double B2 = Math.pow(B, 2);
-        double C = Math.sqrt(A2 + B2);
-        return C;
+    public void setLatitud(double latitud) {
+        this.latitud = latitud;
+    }
+
+    public void setLongitud(double longitud) {
+        this.longitud = longitud;
     }
 
     public double getLatitud() {
@@ -36,12 +35,10 @@ public class Coordenada {
         return this.longitud;
     }
 
-    public void setLatitud(double latitud) {
-        this.latitud = latitud;
-    }
-
-    public void setLongitud(double longitud) {
-        this.longitud = longitud;
+    public double calcularDistancia(Coordenada parametros) {
+        double A = this.latitud - parametros.getLatitud();
+        double B = this.longitud - parametros.getLongitud();
+        return Math.sqrt(A * A + B * B);
     }
 
 }
